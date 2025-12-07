@@ -75,7 +75,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }): Promise<boolean> {
     const response = await api.register(userData);
     if (response.data) {
+      // El registro devuelve access_token y user
+      if (response.data.access_token) {
+        api.setToken(response.data.access_token);
+      }
       setUser(response.data.user);
+      // Forzar actualización del estado
+      await new Promise(resolve => setTimeout(resolve, 100));
       return true;
     }
     return false;

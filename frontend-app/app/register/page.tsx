@@ -47,11 +47,15 @@ export default function RegisterPage() {
     });
 
     if (success) {
-      router.push('/dashboard');
+      // Esperar un momento para que el estado se actualice
+      setTimeout(() => {
+        router.push('/dashboard');
+        router.refresh();
+      }, 100);
     } else {
       setError('Error al registrar. Verifica tus datos.');
+      setLoading(false);
     }
-    setLoading(false);
   }
 
   return (
