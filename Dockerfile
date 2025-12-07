@@ -9,8 +9,12 @@ COPY package*.json ./
 # Instalar todas las dependencias (necesarias para el build)
 RUN npm ci
 
-# Copiar código fuente
-COPY . .
+# Copiar código fuente (excluyendo frontend-app)
+COPY package*.json ./
+COPY tsconfig.json ./
+COPY nest-cli.json ./
+COPY src/ ./src/
+COPY .dockerignore ./
 
 # Compilar la aplicación
 RUN npm run build
