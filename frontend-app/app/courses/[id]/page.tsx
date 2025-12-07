@@ -35,17 +35,39 @@ export default function CourseDetailPage() {
   }, [isAuthenticated, courseId, router]);
 
   async function loadCourse() {
-    const response = await api.getCourse(courseId);
-    if (response.data) {
-      setCourse(response.data);
+    if (!courseId || isNaN(courseId) || courseId <= 0) {
+      router.push('/courses');
+      return;
     }
-    setLoadingCourse(false);
+
+    try {
+      setLoadingCourse(true);
+      const response = await api.getCourse(courseId);
+      if (response.data) {
+        setCourse(response.data);
+      } else {
+        router.push('/courses');
+      }
+    } catch (error) {
+      console.error('Error loading course:', error);
+      router.push('/courses');
+    } finally {
+      setLoadingCourse(false);
+    }
   }
 
   async function checkAccess() {
-    const response = await api.checkAccess(courseId);
-    if (response.data) {
-      setHasAccess(response.data.hasAccess || false);
+    if (!courseId || isNaN(courseId) || courseId <= 0) {
+      return;
+    }
+
+    try {
+      const response = await api.checkAccess(courseId);
+      if (response.data) {
+        setHasAccess(response.data.hasAccess || false);
+      }
+    } catch (error) {
+      console.error('Error checking access:', error);
     }
   }
 
