@@ -14,14 +14,23 @@ async function bootstrap() {
   );
 
   app.enableCors({
-    origin: [
-      'https://learning.getdevtools.com',
-      'http://localhost:3000',
-      'http://localhost:3001',
-    ],
+    origin: (origin, callback) => {
+      const allowedOrigins = [
+        'https://learning.getdevtools.com',
+        'http://localhost:3000',
+        'http://localhost:3001',
+      ];
+      // Permitir requests sin origin (mobile apps, Postman, etc.)
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(null, true); // Permitir todos por ahora para debug
+      }
+    },
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
+    exposedHeaders: ['Authorization'],
   });
 
   const port = process.env.PORT || 3000;
