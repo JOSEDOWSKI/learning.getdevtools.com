@@ -8,13 +8,43 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   const { user, logout } = useAuth();
   const pathname = usePathname();
 
-  const navItems = [
-    { href: '/dashboard', label: 'Dashboard' },
-    { href: '/courses', label: 'Cursos' },
-    { href: '/careers', label: 'Carreras' },
-    { href: '/submissions', label: 'Mis Entregas' },
-    { href: '/certificates', label: 'Certificados' },
-  ];
+  // Navegación según el rol
+  const getNavItems = () => {
+    if (user?.role === 'super_admin') {
+      return [
+        { href: '/admin/dashboard', label: 'Dashboard' },
+        { href: '/admin/users', label: 'Usuarios' },
+        { href: '/admin/courses', label: 'Cursos' },
+        { href: '/admin/submissions', label: 'Entregas' },
+        { href: '/admin/certificates', label: 'Certificados' },
+      ];
+    } else if (user?.role === 'profesor') {
+      return [
+        { href: '/professor/dashboard', label: 'Dashboard' },
+        { href: '/professor/courses', label: 'Mis Cursos' },
+        { href: '/professor/submissions', label: 'Entregas' },
+      ];
+    } else {
+      return [
+        { href: '/dashboard', label: 'Dashboard' },
+        { href: '/courses', label: 'Cursos' },
+        { href: '/careers', label: 'Carreras' },
+        { href: '/submissions', label: 'Mis Entregas' },
+        { href: '/certificates', label: 'Certificados' },
+      ];
+    }
+  };
+
+  const navItems = getNavItems();
+  
+  const getHomeLink = () => {
+    if (user?.role === 'super_admin') {
+      return '/admin/dashboard';
+    } else if (user?.role === 'profesor') {
+      return '/professor/dashboard';
+    }
+    return '/dashboard';
+  };
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -23,7 +53,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           <div className="flex justify-between h-16">
             <div className="flex">
               <div className="flex-shrink-0 flex items-center">
-                <Link href="/dashboard" className="text-xl font-bold text-blue-600">
+                <Link href={getHomeLink()} className="text-xl font-bold text-blue-600">
                   🇵🇪 Plataforma Educativa
                 </Link>
               </div>
