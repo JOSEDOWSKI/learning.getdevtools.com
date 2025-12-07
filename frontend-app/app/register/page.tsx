@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '@/lib/auth';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
@@ -39,21 +39,26 @@ export default function RegisterPage() {
 
     setLoading(true);
 
-    const success = await register({
-      dni: formData.dni,
-      full_name: formData.full_name,
-      email: formData.email,
-      password: formData.password,
-    });
+    try {
+      const success = await register({
+        dni: formData.dni,
+        full_name: formData.full_name,
+        email: formData.email,
+        password: formData.password,
+      });
 
-    if (success) {
-      // Esperar un momento para que el estado se actualice
-      setTimeout(() => {
+      if (success) {
+        // Esperar un momento para que el estado se actualice
+        await new Promise(resolve => setTimeout(resolve, 200));
         router.push('/dashboard');
         router.refresh();
-      }, 100);
-    } else {
-      setError('Error al registrar. Verifica tus datos.');
+      } else {
+        setError('Error al registrar. Verifica tus datos.');
+        setLoading(false);
+      }
+    } catch (err) {
+      console.error('Registration error:', err);
+      setError('Error al registrar. Intenta de nuevo.');
       setLoading(false);
     }
   }
