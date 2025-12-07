@@ -10,7 +10,7 @@ export default function CourseDetailPage() {
   const { isAuthenticated, loading } = useAuth();
   const router = useRouter();
   const params = useParams();
-  const courseId = Number(params.id);
+  const courseId = params.id ? parseInt(params.id as string, 10) : null;
   const [course, setCourse] = useState<any>(null);
   const [hasAccess, setHasAccess] = useState(false);
   const [loadingCourse, setLoadingCourse] = useState(true);
@@ -24,11 +24,15 @@ export default function CourseDetailPage() {
   }, [isAuthenticated, loading, router]);
 
   useEffect(() => {
-    if (isAuthenticated && courseId) {
+    // Validar que courseId sea un número válido
+    if (isAuthenticated && courseId && !isNaN(courseId) && courseId > 0) {
       loadCourse();
       checkAccess();
+    } else if (courseId === null || isNaN(courseId) || courseId <= 0) {
+      // Si el ID no es válido, redirigir a la lista de cursos
+      router.push('/courses');
     }
-  }, [isAuthenticated, courseId]);
+  }, [isAuthenticated, courseId, router]);
 
   async function loadCourse() {
     const response = await api.getCourse(courseId);
