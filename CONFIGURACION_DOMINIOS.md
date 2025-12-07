@@ -3,18 +3,18 @@
 ## 🎯 Configuración Correcta
 
 - **Frontend**: `https://learning.getdevtools.com` (raíz)
-- **Backend API**: `https://api.learning.getdevtools.com` (subdominio)
+- **Backend API**: `https://apilearning.getdevtools.com` (subdominio)
 
 ## 📋 Pasos para Configurar
 
-### 1. Mover el Backend a `api.learning.getdevtools.com`
+### 1. Mover el Backend a `apilearning.getdevtools.com`
 
 En CapRover:
 
 1. **Ve a tu app del backend** (`learninggetdevtools`)
 2. **Ve a "HTTP Settings"**
 3. **Elimina** `learning.getdevtools.com` del dominio
-4. **Agrega** `api.learning.getdevtools.com`
+4. **Agrega** `apilearning.getdevtools.com`
 5. **Habilita SSL** para el nuevo dominio
 6. **Guarda los cambios**
 
@@ -37,7 +37,7 @@ En CapRover:
 
 4. **Variables de Entorno**:
    ```
-   NEXT_PUBLIC_API_URL=https://api.learning.getdevtools.com
+   NEXT_PUBLIC_API_URL=https://apilearning.getdevtools.com
    PORT=3000
    NODE_ENV=production
    ```
@@ -52,7 +52,7 @@ En CapRover:
    - Root Directory: `frontend-app`
    - Framework: Next.js
 4. **Variables de Entorno**:
-   - `NEXT_PUBLIC_API_URL` = `https://api.learning.getdevtools.com`
+   - `NEXT_PUBLIC_API_URL` = `https://apilearning.getdevtools.com`
 5. **Dominio Personalizado**:
    - Agrega `learning.getdevtools.com` en Settings → Domains
    - Configura el DNS según las instrucciones de Vercel
@@ -63,7 +63,7 @@ En CapRover:
 El frontend necesita apuntar al nuevo dominio de la API:
 
 ```env
-NEXT_PUBLIC_API_URL=https://api.learning.getdevtools.com
+NEXT_PUBLIC_API_URL=https://apilearning.getdevtools.com
 ```
 
 ## 🔄 Resumen de Cambios
@@ -74,15 +74,15 @@ NEXT_PUBLIC_API_URL=https://api.learning.getdevtools.com
 
 ### Después:
 - Frontend: `https://learning.getdevtools.com` ✅
-- Backend: `https://api.learning.getdevtools.com` ✅
+- Backend: `https://apilearning.getdevtools.com` ✅
 
 ## 📝 Checklist
 
-- [ ] Mover backend a `api.learning.getdevtools.com` en CapRover
-- [ ] Verificar que el backend funciona en `https://api.learning.getdevtools.com/health`
+- [ ] Mover backend a `apilearning.getdevtools.com` en CapRover
+- [ ] Verificar que el backend funciona en `https://apilearning.getdevtools.com/health`
 - [ ] Desplegar frontend en CapRover o Vercel
 - [ ] Configurar dominio `learning.getdevtools.com` para el frontend
-- [ ] Configurar variable `NEXT_PUBLIC_API_URL=https://api.learning.getdevtools.com`
+- [ ] Configurar variable `NEXT_PUBLIC_API_URL=https://apilearning.getdevtools.com`
 - [ ] Verificar que el frontend funciona en `https://learning.getdevtools.com`
 - [ ] Probar login/registro desde el frontend
 
@@ -90,7 +90,7 @@ NEXT_PUBLIC_API_URL=https://api.learning.getdevtools.com
 
 ### Backend:
 ```bash
-curl https://api.learning.getdevtools.com/health
+curl https://apilearning.getdevtools.com/health
 ```
 Debería responder: `{"status":"ok","timestamp":"..."}`
 
@@ -100,5 +100,5 @@ Deberías ver la página de login (no la API)
 
 ## ⚠️ Nota Importante
 
-Después de mover el backend, cualquier aplicación o servicio que use la API debe actualizar la URL a `https://api.learning.getdevtools.com`.
+Después de mover el backend, cualquier aplicación o servicio que use la API debe actualizar la URL a `https://apilearning.getdevtools.com`.
 
