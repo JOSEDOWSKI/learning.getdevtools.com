@@ -5,16 +5,14 @@ Copia y pega estas variables en CapRover → Tu App → App Configs → Environm
 ## 🔐 Variables de Base de Datos
 
 ```env
-DB_HOST=srv-captain--postgres
+DB_HOST=srv-captain--postgresqllearning
 DB_PORT=5432
 DB_USERNAME=postgres
-DB_PASSWORD=REEMPLAZA_CON_TU_PASSWORD_DE_POSTGRES
+DB_PASSWORD=151022qaz
 DB_DATABASE=learning_platform
 ```
 
-**⚠️ IMPORTANTE**: 
-- Reemplaza `srv-captain--postgres` con el nombre real de tu servicio de PostgreSQL
-- Reemplaza `REEMPLAZA_CON_TU_PASSWORD_DE_POSTGRES` con la contraseña que configuraste en PostgreSQL
+**✅ Configurado con tus datos específicos**
 
 ## 🔑 Variables de JWT
 
