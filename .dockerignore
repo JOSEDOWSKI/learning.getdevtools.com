@@ -16,5 +16,10 @@ README.DEV.md
 API_EXAMPLES.md
 GEMINI_SETUP.md
 CHANGELOG*.md
+CREAR_*.md
+*.md
 schema.dbml
+frontend-app/*.md
+frontend-app/README.md
+frontend-app/VARIABLES_ENTORNO.md
 

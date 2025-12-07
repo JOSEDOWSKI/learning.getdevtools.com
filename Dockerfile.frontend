@@ -11,7 +11,16 @@ RUN npm ci
 FROM base AS builder
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
-COPY frontend-app/ .
+COPY frontend-app/package*.json ./
+COPY frontend-app/next.config.ts ./
+COPY frontend-app/tsconfig.json ./
+COPY frontend-app/postcss.config.mjs ./
+COPY frontend-app/eslint.config.mjs ./
+COPY frontend-app/app ./app
+COPY frontend-app/components ./components
+COPY frontend-app/lib ./lib
+COPY frontend-app/middleware.ts ./
+COPY frontend-app/public ./public
 ENV NEXT_TELEMETRY_DISABLED 1
 ENV SKIP_ENV_VALIDATION=true
 RUN npm run build
