@@ -33,10 +33,10 @@ export default function DashboardPage() {
   async function loadStats() {
     try {
       const [coursesRes, careersRes, submissionsRes, certificatesRes] = await Promise.all([
-        api.getCourses(),
-        api.getCareers(),
-        api.getSubmissions(),
-        api.getCertificates(),
+        api.getCourses().catch(() => ({ data: [] })),
+        api.getCareers().catch(() => ({ data: [] })),
+        api.getSubmissions().catch(() => ({ data: [] })),
+        api.getCertificates().catch(() => ({ data: [] })),
       ]);
 
       setStats({
@@ -68,17 +68,29 @@ export default function DashboardPage() {
     return null;
   }
 
+  if (!user) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Cargando usuario...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <Layout>
       <div className="px-4 sm:px-0">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900">
-            Bienvenido, {user?.full_name}
+            Bienvenido, {user?.full_name || 'Usuario'}
           </h1>
           <p className="mt-2 text-gray-600">
             {user?.role === 'alumno' && 'Estudiante'}
             {user?.role === 'profesor' && 'Profesor'}
             {user?.role === 'super_admin' && 'Administrador'}
+            {!user?.role && 'Usuario'}
           </p>
         </div>
 
