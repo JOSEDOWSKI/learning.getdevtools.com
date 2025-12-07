@@ -59,12 +59,27 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   async function login(email: string, password: string): Promise<boolean> {
-    const response = await api.login(email, password);
-    if (response.data) {
-      setUser(response.data.user);
-      return true;
+    try {
+      const response = await api.login(email, password);
+      if (response.data && response.data.user) {
+        // Guardar token en localStorage
+        if (response.data.access_token) {
+          api.setToken(response.data.access_token);
+          localStorage.setItem('token', response.data.access_token);
+        }
+        setUser(response.data.user);
+        // Forzar actualización del estado
+        await new Promise(resolve => setTimeout(resolve, 100));
+        return true;
+      }
+      if (response.error) {
+        console.error('Login error:', response.error);
+      }
+      return false;
+    } catch (error) {
+      console.error('Login exception:', error);
+      return false;
     }
-    return false;
   }
 
   async function register(userData: {

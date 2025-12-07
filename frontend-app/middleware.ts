@@ -2,23 +2,15 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
 export function middleware(request: NextRequest) {
-  const token = request.cookies.get('token')?.value;
   const { pathname } = request.nextUrl;
 
-  // Rutas públicas
+  // Rutas públicas - no bloquear, dejar que el cliente maneje la autenticación
+  // ya que usamos localStorage que no es accesible desde el middleware
   const publicPaths = ['/login', '/register'];
   const isPublicPath = publicPaths.includes(pathname);
 
-  // Si no hay token y está intentando acceder a una ruta protegida
-  if (!token && !isPublicPath) {
-    return NextResponse.redirect(new URL('/login', request.url));
-  }
-
-  // Si hay token y está en login/register, redirigir al dashboard
-  if (token && isPublicPath) {
-    return NextResponse.redirect(new URL('/dashboard', request.url));
-  }
-
+  // El middleware no puede acceder a localStorage, así que no bloqueamos rutas
+  // La autenticación se maneja en el cliente (useAuth hook)
   return NextResponse.next();
 }
 
