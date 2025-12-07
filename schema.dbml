@@ -1,0 +1,147 @@
+// -- USER MANAGEMENT & IDENTITY --
+Table users {
+  id integer [primary key]
+  dni varchar [unique, note: 'Validación con RENIEC/Estado']
+  full_name varchar
+  email varchar [unique]
+  role varchar [note: 'super_admin, profesor, alumno, reclutador']
+  linkedin_url varchar
+  github_url varchar
+  portfolio_url varchar
+  created_at timestamp
+}
+
+Table identity_audit {
+  id integer [primary key]
+  user_id integer [ref: > users.id]
+  session_token varchar
+  facial_validation_hash varchar [note: 'Hash biométrico por sesión crítica']
+  validated_at timestamp
+}
+
+// -- ADMINISTRATIVE & FINANCIAL SETTINGS --
+Table platform_settings {
+  id integer [primary key]
+  platform_fee_pct float [default: 20.0, note: '% que retiene el gobierno']
+  min_payout_amount decimal(10,2) [default: 500.00]
+  is_maintenance_mode boolean [default: false]
+}
+
+Table wallets {
+  id integer [primary key]
+  user_id integer [ref: - users.id]
+  balance decimal(12,2) [default: 0]
+}
+
+Table payouts {
+  id integer [primary key]
+  professor_id integer [ref: > users.id]
+  amount decimal(12,2)
+  status varchar [note: 'pending, paid']
+  transaction_ref varchar
+  created_at timestamp
+}
+
+// -- ACADEMIC CONTENT & PRICING --
+Table careers {
+  id integer [primary key]
+  name varchar
+  description text
+  total_months integer
+  status varchar [note: 'active, draft']
+}
+
+Table courses {
+  id integer [primary key]
+  professor_id integer [ref: > users.id]
+  title varchar
+  base_price decimal(10,2) [default: 150.00, note: 'Precio en Soles']
+  revenue_share_pct float [note: 'Porcentaje para el profesor']
+  is_shared_access boolean [default: false, note: 'True para cursos tipo Inglés B2B']
+  credits integer
+}
+
+Table career_curriculum {
+  id integer [primary key]
+  career_id integer [ref: > careers.id]
+  course_id integer [ref: > courses.id]
+  order_index integer [note: 'Mes 1, 2... 24']
+}
+
+// -- TRANSACTIONS & ACCESS --
+Table transactions {
+  id integer [primary key]
+  student_id integer [ref: > users.id]
+  course_id integer [ref: > courses.id, null]
+  career_id integer [ref: > careers.id, null]
+  amount decimal(10,2)
+  payment_method varchar [note: 'Yape, Plin, Card']
+  status varchar [note: 'pending, completed']
+  transaction_ref varchar
+  created_at timestamp
+}
+
+Table course_access {
+  id integer [primary key]
+  student_id integer [ref: > users.id]
+  course_id integer [ref: > courses.id]
+  access_type varchar [note: 'purchased, company_seat, scholarship']
+  transaction_id integer [ref: > transactions.id, null]
+  is_active boolean [default: true]
+}
+
+Table company_access {
+  id integer [primary key]
+  company_name varchar
+  course_id integer [ref: > courses.id]
+  seats_purchased integer
+  seats_used integer
+  valid_until timestamp
+}
+
+// -- SUBMISSIONS & AI GRADING --
+Table submissions {
+  id integer [primary key]
+  student_id integer [ref: > users.id]
+  course_id integer [ref: > courses.id]
+  project_url varchar [note: 'Link a repo o nube']
+  submitted_at timestamp
+}
+
+Table ai_evaluations {
+  id integer [primary key]
+  submission_id integer [ref: - submissions.id]
+  score float [note: 'Calificación 0-20']
+  feedback_summary text
+  rubric_breakdown json
+  ai_model_version varchar [note: 'Ej: gpt-4o']
+  processed_at timestamp
+}
+
+// -- EMPLEABILIDAD & CERTIFICACIÓN --
+Table skills_matrix {
+  id integer [primary key]
+  student_id integer [ref: > users.id]
+  skill_name varchar
+  proficiency_score float
+  updated_at timestamp
+}
+
+Table certificates {
+  id integer [primary key]
+  user_id integer [ref: > users.id]
+  career_id integer [ref: > careers.id, null]
+  course_id integer [ref: > courses.id, null]
+  hash_digital_signature varchar [unique]
+  is_national_title boolean [default: false]
+  issue_date timestamp
+}
+
+// -- LOGS --
+Table admin_audit_logs {
+  id integer [primary key]
+  admin_id integer [ref: > users.id]
+  action varchar
+  target_id integer
+  timestamp timestamp
+}
