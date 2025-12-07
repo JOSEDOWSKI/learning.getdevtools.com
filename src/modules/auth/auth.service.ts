@@ -15,6 +15,7 @@ export class AuthService {
     try {
       const user = await this.usersService.findByEmail(email);
       if (!user) {
+        console.log(`User not found: ${email}`);
         return null;
       }
       if (!user.password) {
@@ -22,14 +23,16 @@ export class AuthService {
         return null;
       }
       const isPasswordValid = await bcrypt.compare(password, user.password);
+      console.log(`Password validation for ${email}: ${isPasswordValid}`);
       if (isPasswordValid) {
         const { password, ...result } = user;
         return result;
       }
+      console.log(`Invalid password for ${email}`);
       return null;
     } catch (error) {
       console.error('Error validating user:', error);
-      throw error;
+      return null; // Retornar null en lugar de lanzar error para evitar 500
     }
   }
 
