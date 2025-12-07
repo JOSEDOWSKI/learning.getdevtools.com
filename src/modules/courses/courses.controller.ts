@@ -7,6 +7,7 @@ import {
   Param,
   Delete,
   UseGuards,
+  BadRequestException,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { CoursesService } from './courses.service';
@@ -73,19 +74,31 @@ export class CoursesController {
 
   @Get('careers/:id')
   findOneCareer(@Param('id') id: string) {
-    return this.coursesService.findOneCareer(+id);
+    const careerId = parseInt(id, 10);
+    if (isNaN(careerId) || careerId <= 0) {
+      throw new BadRequestException('ID de carrera inválido');
+    }
+    return this.coursesService.findOneCareer(careerId);
   }
 
   @UseGuards(AuthGuard('jwt'))
   @Patch('careers/:id')
   updateCareer(@Param('id') id: string, @Body() updateCareerDto: UpdateCareerDto) {
-    return this.coursesService.updateCareer(+id, updateCareerDto);
+    const careerId = parseInt(id, 10);
+    if (isNaN(careerId) || careerId <= 0) {
+      throw new BadRequestException('ID de carrera inválido');
+    }
+    return this.coursesService.updateCareer(careerId, updateCareerDto);
   }
 
   @UseGuards(AuthGuard('jwt'))
   @Delete('careers/:id')
   removeCareer(@Param('id') id: string) {
-    return this.coursesService.removeCareer(+id);
+    const careerId = parseInt(id, 10);
+    if (isNaN(careerId) || careerId <= 0) {
+      throw new BadRequestException('ID de carrera inválido');
+    }
+    return this.coursesService.removeCareer(careerId);
   }
 
   // Curriculum endpoints
