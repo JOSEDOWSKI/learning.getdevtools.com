@@ -48,7 +48,7 @@ export class DatabaseConfig implements TypeOrmOptionsFactory {
         Certificate,
         AdminAuditLog,
       ],
-      synchronize: this.configService.get<string>('NODE_ENV') === 'development',
+      synchronize: true, // Habilitado para crear tablas automáticamente
       logging: this.configService.get<string>('NODE_ENV') === 'development',
     };
   }
