@@ -30,7 +30,6 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
-  const router = useRouter();
 
   useEffect(() => {
     checkAuth();
@@ -38,6 +37,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   async function checkAuth() {
     try {
+      if (typeof window === 'undefined') {
+        setLoading(false);
+        return;
+      }
+
       const token = localStorage.getItem('token');
       if (!token) {
         setLoading(false);
@@ -50,9 +54,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setUser(response.data);
       } else {
         api.clearToken();
+        setUser(null);
       }
     } catch (error) {
+      console.error('Error checking auth:', error);
       api.clearToken();
+      setUser(null);
     } finally {
       setLoading(false);
     }
@@ -114,7 +121,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   function logout() {
     api.clearToken();
     setUser(null);
-    router.push('/login');
+    if (typeof window !== 'undefined') {
+      window.location.href = '/login';
+    }
   }
 
   return (

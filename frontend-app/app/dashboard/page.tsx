@@ -21,6 +21,7 @@ export default function DashboardPage() {
   useEffect(() => {
     if (!loading && !isAuthenticated) {
       router.push('/login');
+      return;
     }
   }, [isAuthenticated, loading, router]);
 
@@ -63,9 +64,8 @@ export default function DashboardPage() {
     );
   }
 
-  if (!isAuthenticated) {
-    router.push('/login');
-    return null;
+  if (!isAuthenticated && !loading) {
+    return null; // El useEffect manejará la redirección
   }
 
   if (!user) {
