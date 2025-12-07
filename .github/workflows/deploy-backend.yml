@@ -1,0 +1,17 @@
+name: Deploy Backend to CapRover
+
+on:
+  push:
+    branches:
+      - backend
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Trigger CapRover Build
+        run: |
+          curl -X POST "https://captain.panel.getdevtools.com/api/v2/user/apps/webhooks/triggerbuild?namespace=captain&token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkYXRhIjp7InRva2VuVmVyc2lvbiI6ImE2ZGJiNzMwLTdlZmUtNDQ1MC04N2M5LWVjNGRlYzI5Y2ExMiIsImFwcE5hbWUiOiJsZWFybmluZy1iYWNrZW5kIiwibmFtZXNwYWNlIjoiY2FwdGFpbiJ9LCJpYXQiOjE3NjUxNDcxNjN9.1hhrMGxZRX92EjNW4xRh-7BqZO8pxUfI4Upbkq2TJ6w"
+
