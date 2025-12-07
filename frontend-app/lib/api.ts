@@ -1,7 +1,10 @@
 // URL de la API backend
 // En producción: https://apilearning.getdevtools.com
 // En desarrollo: http://localhost:3000
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
+const API_URL = 
+  typeof window !== 'undefined' 
+    ? (process.env.NEXT_PUBLIC_API_URL || 'https://apilearning.getdevtools.com')
+    : (process.env.NEXT_PUBLIC_API_URL || 'https://apilearning.getdevtools.com');
 
 export interface ApiResponse<T> {
   data?: T;
