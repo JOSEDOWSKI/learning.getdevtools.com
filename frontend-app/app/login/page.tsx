@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '@/lib/auth';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
@@ -13,10 +13,19 @@ export default function LoginPage() {
   const { login, isAuthenticated, user } = useAuth();
   const router = useRouter();
 
-  if (isAuthenticated) {
-    router.push('/dashboard');
-    return null;
-  }
+  // Redirigir según el rol cuando el usuario se autentica
+  useEffect(() => {
+    if (isAuthenticated && user) {
+      const role = user.role;
+      if (role === 'super_admin') {
+        router.push('/admin/dashboard');
+      } else if (role === 'profesor') {
+        router.push('/professor/dashboard');
+      } else {
+        router.push('/dashboard');
+      }
+    }
+  }, [isAuthenticated, user, router]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -25,11 +34,13 @@ export default function LoginPage() {
 
     const success = await login(email, password);
     if (success) {
-      router.push('/dashboard');
+      // Esperar a que el estado se actualice
+      await new Promise(resolve => setTimeout(resolve, 300));
+      // El useEffect manejará la redirección cuando user se actualice
     } else {
       setError('Credenciales inválidas');
+      setLoading(false);
     }
-    setLoading(false);
   }
 
   return (
