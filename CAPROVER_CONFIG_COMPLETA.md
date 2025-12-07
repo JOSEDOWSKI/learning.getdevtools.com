@@ -12,9 +12,17 @@
 
 Ejecuta este comando desde el terminal de CapRover o SSH:
 
+**Opción 1: Usar el ID del contenedor (más fácil)**
 ```bash
-docker exec -it srv-captain--postgresqllearning psql -U postgres -c "CREATE DATABASE learning_platform;"
+docker exec -it 2e94893583fd psql -U postgres -c "CREATE DATABASE learning_platform;"
 ```
+
+**Opción 2: Usar el nombre completo del contenedor**
+```bash
+docker exec -it srv-captain--postgresqllearning.1.545j2j98mw8ogm88q6drl4cme psql -U postgres -c "CREATE DATABASE learning_platform;"
+```
+
+**Nota**: El ID del contenedor puede cambiar si se reinicia. Si eso pasa, ejecuta `docker ps | grep postgresqllearning` para obtener el nuevo ID.
 
 O desde el terminal de la app de PostgreSQL en CapRover:
 
@@ -67,13 +75,13 @@ OPENAI_API_KEY=tu-api-key-de-openai
 ### 1. Verificar que la base de datos existe:
 
 ```bash
-docker exec -it srv-captain--postgresqllearning psql -U postgres -c "\l" | grep learning_platform
+docker exec -it 2e94893583fd psql -U postgres -c "\l" | grep learning_platform
 ```
 
 ### 2. Verificar las tablas (después de que la app inicie):
 
 ```bash
-docker exec -it srv-captain--postgresqllearning psql -U postgres -d learning_platform -c "\dt"
+docker exec -it 2e94893583fd psql -U postgres -d learning_platform -c "\dt"
 ```
 
 Deberías ver 16 tablas.
@@ -106,13 +114,15 @@ Debería responder: `{"status":"ok","timestamp":"..."}`
 
 **Solución:**
 ```bash
-docker exec -it srv-captain--postgresqllearning psql -U postgres -c "CREATE DATABASE learning_platform;"
+docker exec -it 2e94893583fd psql -U postgres -c "CREATE DATABASE learning_platform;"
 ```
+
+**Nota**: Si el contenedor se reinicia, el ID puede cambiar. Usa `docker ps | grep postgresqllearning` para obtener el ID actual.
 
 ### Verificar conexión manualmente
 
 ```bash
-docker exec -it srv-captain--postgresqllearning psql -U postgres -d learning_platform -c "SELECT version();"
+docker exec -it 2e94893583fd psql -U postgres -d learning_platform -c "SELECT version();"
 ```
 
 ## 📝 Resumen de Variables (Listo para Copiar)
