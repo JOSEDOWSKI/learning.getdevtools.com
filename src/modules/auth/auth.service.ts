@@ -12,25 +12,47 @@ export class AuthService {
   ) {}
 
   async validateUser(email: string, password: string): Promise<any> {
-    const user = await this.usersService.findByEmail(email);
-    if (user && (await bcrypt.compare(password, user.password))) {
-      const { password, ...result } = user;
-      return result;
+    try {
+      const user = await this.usersService.findByEmail(email);
+      if (!user) {
+        return null;
+      }
+      if (!user.password) {
+        console.error('User found but password is missing');
+        return null;
+      }
+      const isPasswordValid = await bcrypt.compare(password, user.password);
+      if (isPasswordValid) {
+        const { password, ...result } = user;
+        return result;
+      }
+      return null;
+    } catch (error) {
+      console.error('Error validating user:', error);
+      throw error;
     }
-    return null;
   }
 
   async login(user: any) {
-    const payload = { email: user.email, sub: user.id, role: user.role };
-    return {
-      access_token: this.jwtService.sign(payload),
-      user: {
-        id: user.id,
-        email: user.email,
-        full_name: user.full_name,
-        role: user.role,
-      },
-    };
+    try {
+      if (!user || !user.email || !user.id) {
+        throw new Error('Invalid user object');
+      }
+      const payload = { email: user.email, sub: user.id, role: user.role };
+      const access_token = this.jwtService.sign(payload);
+      return {
+        access_token,
+        user: {
+          id: user.id,
+          email: user.email,
+          full_name: user.full_name,
+          role: user.role,
+        },
+      };
+    } catch (error) {
+      console.error('Error in login:', error);
+      throw error;
+    }
   }
 
   async register(registerDto: {
