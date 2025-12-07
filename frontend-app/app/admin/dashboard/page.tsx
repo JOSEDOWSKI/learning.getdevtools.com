@@ -7,12 +7,12 @@ import { api } from '@/lib/api';
 import Layout from '@/components/Layout';
 import Link from 'next/link';
 
-export default function DashboardPage() {
+export default function AdminDashboardPage() {
   const { isAuthenticated, loading, user } = useAuth();
   const router = useRouter();
   const [stats, setStats] = useState({
+    users: 0,
     courses: 0,
-    careers: 0,
     submissions: 0,
     certificates: 0,
   });
@@ -23,37 +23,30 @@ export default function DashboardPage() {
       router.push('/login');
       return;
     }
-    // Redirigir según el rol si no es alumno
-    if (!loading && isAuthenticated && user) {
-      if (user.role === 'super_admin') {
-        router.push('/admin/dashboard');
-        return;
-      }
-      if (user.role === 'profesor') {
-        router.push('/professor/dashboard');
-        return;
-      }
+    if (!loading && isAuthenticated && user?.role !== 'super_admin') {
+      router.push('/dashboard');
+      return;
     }
   }, [isAuthenticated, loading, router, user]);
 
   useEffect(() => {
-    if (isAuthenticated) {
+    if (isAuthenticated && user?.role === 'super_admin') {
       loadStats();
     }
-  }, [isAuthenticated]);
+  }, [isAuthenticated, user]);
 
   async function loadStats() {
     try {
-      const [coursesRes, careersRes, submissionsRes, certificatesRes] = await Promise.all([
+      const [usersRes, coursesRes, submissionsRes, certificatesRes] = await Promise.all([
+        api.getUsers().catch(() => ({ data: [] })),
         api.getCourses().catch(() => ({ data: [] })),
-        api.getCareers().catch(() => ({ data: [] })),
         api.getSubmissions().catch(() => ({ data: [] })),
         api.getCertificates().catch(() => ({ data: [] })),
       ]);
 
       setStats({
+        users: usersRes.data?.length || 0,
         courses: coursesRes.data?.length || 0,
-        careers: careersRes.data?.length || 0,
         submissions: submissionsRes.data?.length || 0,
         certificates: certificatesRes.data?.length || 0,
       });
@@ -75,19 +68,8 @@ export default function DashboardPage() {
     );
   }
 
-  if (!isAuthenticated && !loading) {
-    return null; // El useEffect manejará la redirección
-  }
-
-  if (!user) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Cargando usuario...</p>
-        </div>
-      </div>
-    );
+  if (!isAuthenticated || user?.role !== 'super_admin') {
+    return null;
   }
 
   return (
@@ -95,17 +77,44 @@ export default function DashboardPage() {
       <div className="px-4 sm:px-0">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900">
-            Bienvenido, {user?.full_name || 'Usuario'}
+            Panel de Administración
           </h1>
           <p className="mt-2 text-gray-600">
-            {user?.role === 'alumno' && 'Estudiante'}
-            {user?.role === 'profesor' && 'Profesor'}
-            {user?.role === 'super_admin' && 'Administrador'}
-            {!user?.role && 'Usuario'}
+            Bienvenido, {user?.full_name || 'Administrador'}
           </p>
         </div>
 
         <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4 mb-8">
+          <div className="bg-white overflow-hidden shadow rounded-lg">
+            <div className="p-5">
+              <div className="flex items-center">
+                <div className="flex-shrink-0">
+                  <div className="text-2xl">👥</div>
+                </div>
+                <div className="ml-5 w-0 flex-1">
+                  <dl>
+                    <dt className="text-sm font-medium text-gray-500 truncate">
+                      Usuarios
+                    </dt>
+                    <dd className="text-lg font-medium text-gray-900">
+                      {loadingStats ? '...' : stats.users}
+                    </dd>
+                  </dl>
+                </div>
+              </div>
+            </div>
+            <div className="bg-gray-50 px-5 py-3">
+              <div className="text-sm">
+                <Link
+                  href="/admin/users"
+                  className="font-medium text-blue-600 hover:text-blue-900"
+                >
+                  Gestionar usuarios
+                </Link>
+              </div>
+            </div>
+          </div>
+
           <div className="bg-white overflow-hidden shadow rounded-lg">
             <div className="p-5">
               <div className="flex items-center">
@@ -115,7 +124,7 @@ export default function DashboardPage() {
                 <div className="ml-5 w-0 flex-1">
                   <dl>
                     <dt className="text-sm font-medium text-gray-500 truncate">
-                      Cursos Disponibles
+                      Cursos
                     </dt>
                     <dd className="text-lg font-medium text-gray-900">
                       {loadingStats ? '...' : stats.courses}
@@ -127,40 +136,10 @@ export default function DashboardPage() {
             <div className="bg-gray-50 px-5 py-3">
               <div className="text-sm">
                 <Link
-                  href="/courses"
+                  href="/admin/courses"
                   className="font-medium text-blue-600 hover:text-blue-900"
                 >
-                  Ver todos
-                </Link>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white overflow-hidden shadow rounded-lg">
-            <div className="p-5">
-              <div className="flex items-center">
-                <div className="flex-shrink-0">
-                  <div className="text-2xl">🎓</div>
-                </div>
-                <div className="ml-5 w-0 flex-1">
-                  <dl>
-                    <dt className="text-sm font-medium text-gray-500 truncate">
-                      Carreras
-                    </dt>
-                    <dd className="text-lg font-medium text-gray-900">
-                      {loadingStats ? '...' : stats.careers}
-                    </dd>
-                  </dl>
-                </div>
-              </div>
-            </div>
-            <div className="bg-gray-50 px-5 py-3">
-              <div className="text-sm">
-                <Link
-                  href="/careers"
-                  className="font-medium text-blue-600 hover:text-blue-900"
-                >
-                  Ver todas
+                  Gestionar cursos
                 </Link>
               </div>
             </div>
@@ -175,7 +154,7 @@ export default function DashboardPage() {
                 <div className="ml-5 w-0 flex-1">
                   <dl>
                     <dt className="text-sm font-medium text-gray-500 truncate">
-                      Mis Entregas
+                      Entregas
                     </dt>
                     <dd className="text-lg font-medium text-gray-900">
                       {loadingStats ? '...' : stats.submissions}
@@ -187,10 +166,10 @@ export default function DashboardPage() {
             <div className="bg-gray-50 px-5 py-3">
               <div className="text-sm">
                 <Link
-                  href="/submissions"
+                  href="/admin/submissions"
                   className="font-medium text-blue-600 hover:text-blue-900"
                 >
-                  Ver todas
+                  Ver todas las entregas
                 </Link>
               </div>
             </div>
@@ -217,10 +196,10 @@ export default function DashboardPage() {
             <div className="bg-gray-50 px-5 py-3">
               <div className="text-sm">
                 <Link
-                  href="/certificates"
+                  href="/admin/certificates"
                   className="font-medium text-blue-600 hover:text-blue-900"
                 >
-                  Ver todos
+                  Ver certificados
                 </Link>
               </div>
             </div>
@@ -229,43 +208,43 @@ export default function DashboardPage() {
 
         <div className="bg-white shadow rounded-lg p-6">
           <h2 className="text-xl font-semibold text-gray-900 mb-4">
-            Accesos Rápidos
+            Acciones Rápidas
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <Link
-              href="/courses"
+              href="/admin/users"
               className="p-4 border-2 border-gray-200 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-colors"
             >
-              <h3 className="font-semibold text-gray-900">Explorar Cursos</h3>
+              <h3 className="font-semibold text-gray-900">Gestionar Usuarios</h3>
               <p className="text-sm text-gray-600 mt-1">
-                Ver todos los cursos disponibles
+                Ver, editar y cambiar roles de usuarios
               </p>
             </Link>
             <Link
-              href="/careers"
+              href="/admin/courses"
               className="p-4 border-2 border-gray-200 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-colors"
             >
-              <h3 className="font-semibold text-gray-900">Ver Carreras</h3>
+              <h3 className="font-semibold text-gray-900">Gestionar Cursos</h3>
               <p className="text-sm text-gray-600 mt-1">
-                Explora las carreras completas
+                Crear, editar y eliminar cursos y carreras
               </p>
             </Link>
             <Link
-              href="/submissions"
+              href="/admin/submissions"
               className="p-4 border-2 border-gray-200 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-colors"
             >
-              <h3 className="font-semibold text-gray-900">Mis Entregas</h3>
+              <h3 className="font-semibold text-gray-900">Ver Entregas</h3>
               <p className="text-sm text-gray-600 mt-1">
-                Ver y gestionar tus entregas
+                Revisar todas las entregas de estudiantes
               </p>
             </Link>
             <Link
-              href="/certificates"
+              href="/admin/certificates"
               className="p-4 border-2 border-gray-200 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-colors"
             >
               <h3 className="font-semibold text-gray-900">Certificados</h3>
               <p className="text-sm text-gray-600 mt-1">
-                Ver tus certificados obtenidos
+                Ver y gestionar todos los certificados
               </p>
             </Link>
           </div>

@@ -177,6 +177,69 @@ class ApiClient {
       `/access/check/${courseId}`
     );
   }
+
+  // Admin & Users
+  async getUsers() {
+    return this.request<any[]>('/users');
+  }
+
+  async getUser(id: number) {
+    return this.request<any>(`/users/${id}`);
+  }
+
+  async updateUser(id: number, userData: any) {
+    return this.request<any>(`/users/${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify(userData),
+    });
+  }
+
+  async deleteUser(id: number) {
+    return this.request<any>(`/users/${id}`, {
+      method: 'DELETE',
+    });
+  }
+
+  // Course Management
+  async createCourse(courseData: any) {
+    return this.request<any>('/courses', {
+      method: 'POST',
+      body: JSON.stringify(courseData),
+    });
+  }
+
+  async updateCourse(id: number, courseData: any) {
+    return this.request<any>(`/courses/${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify(courseData),
+    });
+  }
+
+  async deleteCourse(id: number) {
+    return this.request<any>(`/courses/${id}`, {
+      method: 'DELETE',
+    });
+  }
+
+  async createCareer(careerData: any) {
+    return this.request<any>('/courses/careers', {
+      method: 'POST',
+      body: JSON.stringify(careerData),
+    });
+  }
+
+  async updateCareer(id: number, careerData: any) {
+    return this.request<any>(`/courses/careers/${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify(careerData),
+    });
+  }
+
+  async deleteCareer(id: number) {
+    return this.request<any>(`/courses/careers/${id}`, {
+      method: 'DELETE',
+    });
+  }
 }
 
 export const api = new ApiClient();
