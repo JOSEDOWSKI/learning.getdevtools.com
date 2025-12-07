@@ -240,6 +240,20 @@ class ApiClient {
       method: 'DELETE',
     });
   }
+
+  // User Management (for admin)
+  async createUser(userData: {
+    dni: string;
+    full_name: string;
+    email: string;
+    password: string;
+    role?: string;
+  }) {
+    return this.request<any>('/users', {
+      method: 'POST',
+      body: JSON.stringify(userData),
+    });
+  }
 }
 
 export const api = new ApiClient();
