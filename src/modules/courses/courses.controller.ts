@@ -32,19 +32,31 @@ export class CoursesController {
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.coursesService.findOne(+id);
+    const courseId = parseInt(id, 10);
+    if (isNaN(courseId) || courseId <= 0) {
+      throw new BadRequestException('ID de curso inválido');
+    }
+    return this.coursesService.findOne(courseId);
   }
 
   @UseGuards(AuthGuard('jwt'))
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateCourseDto: UpdateCourseDto) {
-    return this.coursesService.update(+id, updateCourseDto);
+    const courseId = parseInt(id, 10);
+    if (isNaN(courseId) || courseId <= 0) {
+      throw new BadRequestException('ID de curso inválido');
+    }
+    return this.coursesService.update(courseId, updateCourseDto);
   }
 
   @UseGuards(AuthGuard('jwt'))
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.coursesService.remove(+id);
+    const courseId = parseInt(id, 10);
+    if (isNaN(courseId) || courseId <= 0) {
+      throw new BadRequestException('ID de curso inválido');
+    }
+    return this.coursesService.remove(courseId);
   }
 
   // Careers endpoints
@@ -84,7 +96,15 @@ export class CoursesController {
     @Param('courseId') courseId: string,
     @Body('orderIndex') orderIndex: number,
   ) {
-    return this.coursesService.addCourseToCareer(+careerId, +courseId, orderIndex);
+    const parsedCareerId = parseInt(careerId, 10);
+    const parsedCourseId = parseInt(courseId, 10);
+    if (isNaN(parsedCareerId) || parsedCareerId <= 0) {
+      throw new BadRequestException('ID de carrera inválido');
+    }
+    if (isNaN(parsedCourseId) || parsedCourseId <= 0) {
+      throw new BadRequestException('ID de curso inválido');
+    }
+    return this.coursesService.addCourseToCareer(parsedCareerId, parsedCourseId, orderIndex);
   }
 
   @UseGuards(AuthGuard('jwt'))
@@ -93,7 +113,15 @@ export class CoursesController {
     @Param('careerId') careerId: string,
     @Param('courseId') courseId: string,
   ) {
-    return this.coursesService.removeCourseFromCareer(+careerId, +courseId);
+    const parsedCareerId = parseInt(careerId, 10);
+    const parsedCourseId = parseInt(courseId, 10);
+    if (isNaN(parsedCareerId) || parsedCareerId <= 0) {
+      throw new BadRequestException('ID de carrera inválido');
+    }
+    if (isNaN(parsedCourseId) || parsedCourseId <= 0) {
+      throw new BadRequestException('ID de curso inválido');
+    }
+    return this.coursesService.removeCourseFromCareer(parsedCareerId, parsedCourseId);
   }
 }
 
