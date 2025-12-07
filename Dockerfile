@@ -6,14 +6,17 @@ WORKDIR /app
 # Copiar archivos de dependencias
 COPY package*.json ./
 
-# Instalar dependencias de producción
-RUN npm ci --only=production
+# Instalar todas las dependencias (necesarias para el build)
+RUN npm ci
 
 # Copiar código fuente
 COPY . .
 
 # Compilar la aplicación
 RUN npm run build
+
+# Eliminar dependencias de desarrollo después del build
+RUN npm prune --production
 
 # Exponer puerto
 EXPOSE 3000
