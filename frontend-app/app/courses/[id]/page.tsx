@@ -75,6 +75,11 @@ export default function CourseDetailPage() {
     e.preventDefault();
     if (!submissionUrl.trim()) return;
 
+    if (!courseId || isNaN(courseId) || courseId <= 0) {
+      alert('ID de curso inválido');
+      return;
+    }
+
     setSubmitting(true);
     const response = await api.createSubmission(courseId, submissionUrl);
     if (response.data) {
