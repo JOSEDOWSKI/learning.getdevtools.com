@@ -5,6 +5,7 @@ import { useAuth } from '@/lib/auth';
 import { useRouter, useParams } from 'next/navigation';
 import { api } from '@/lib/api';
 import Layout from '@/components/Layout';
+import Link from 'next/link';
 
 interface Career {
   id: number;
