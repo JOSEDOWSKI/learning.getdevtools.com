@@ -7,13 +7,8 @@ import {
   Param,
   Delete,
   UseGuards,
-<<<<<<< HEAD
   Request,
   BadRequestException,
-=======
-  BadRequestException,
-  Request,
->>>>>>> backend
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { CoursesService } from './courses.service';
@@ -143,58 +138,6 @@ export class CoursesController {
       throw new BadRequestException('ID de curso inválido');
     }
     return this.coursesService.removeCourseFromCareer(parsedCareerId, parsedCourseId);
-  }
-
-  // Lessons endpoints
-  @UseGuards(AuthGuard('jwt'))
-  @Post('lessons')
-  createLesson(@Body() createLessonDto: CreateLessonDto, @Request() req) {
-    const professorId = req.user.sub;
-    return this.coursesService.createLesson(createLessonDto, professorId);
-  }
-
-  @Get('courses/:courseId/lessons')
-  findAllLessons(@Param('courseId') courseId: string) {
-    const courseIdNum = parseInt(courseId, 10);
-    if (isNaN(courseIdNum) || courseIdNum <= 0) {
-      throw new BadRequestException('ID de curso inválido');
-    }
-    return this.coursesService.findAllLessons(courseIdNum);
-  }
-
-  @Get('lessons/:id')
-  findOneLesson(@Param('id') id: string) {
-    const lessonId = parseInt(id, 10);
-    if (isNaN(lessonId) || lessonId <= 0) {
-      throw new BadRequestException('ID de lección inválido');
-    }
-    return this.coursesService.findOneLesson(lessonId);
-  }
-
-  @UseGuards(AuthGuard('jwt'))
-  @Patch('lessons/:id')
-  updateLesson(
-    @Param('id') id: string,
-    @Body() updateLessonDto: UpdateLessonDto,
-    @Request() req,
-  ) {
-    const lessonId = parseInt(id, 10);
-    if (isNaN(lessonId) || lessonId <= 0) {
-      throw new BadRequestException('ID de lección inválido');
-    }
-    const professorId = req.user.sub;
-    return this.coursesService.updateLesson(lessonId, updateLessonDto, professorId);
-  }
-
-  @UseGuards(AuthGuard('jwt'))
-  @Delete('lessons/:id')
-  removeLesson(@Param('id') id: string, @Request() req) {
-    const lessonId = parseInt(id, 10);
-    if (isNaN(lessonId) || lessonId <= 0) {
-      throw new BadRequestException('ID de lección inválido');
-    }
-    const professorId = req.user.sub;
-    return this.coursesService.removeLesson(lessonId, professorId);
   }
 
   // Lessons endpoints

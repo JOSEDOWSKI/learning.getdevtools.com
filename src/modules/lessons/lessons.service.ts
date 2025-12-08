@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, In } from 'typeorm';
 import { LessonProgress } from './entities/lesson-progress.entity';
 import { Lesson } from '../courses/entities/lesson.entity';
 import { CoursesService } from '../courses/courses.service';
@@ -147,12 +147,15 @@ export class LessonsService {
       order: { order_index: 'ASC' },
     });
 
-    const progressList = await this.progressRepository.find({
-      where: {
-        student_id: studentId,
-        lesson_id: lessons.map((l) => l.id),
-      },
-    });
+    const lessonIds = lessons.map((l) => l.id);
+    const progressList = lessonIds.length > 0
+      ? await this.progressRepository.find({
+          where: {
+            student_id: studentId,
+            lesson_id: In(lessonIds),
+          },
+        })
+      : [];
 
     const progressMap = new Map(
       progressList.map((p) => [p.lesson_id, p]),

@@ -25,11 +25,8 @@ export class CoursesService {
     private curriculumRepository: Repository<CareerCurriculum>,
     @InjectRepository(Lesson)
     private lessonRepository: Repository<Lesson>,
-<<<<<<< HEAD
-=======
     @InjectRepository(CourseAccess)
     private courseAccessRepository: Repository<CourseAccess>,
->>>>>>> backend
   ) {}
 
   // Courses
@@ -194,8 +191,6 @@ export class CoursesService {
     return this.findOneLesson(id);
   }
 
-<<<<<<< HEAD
-=======
   async updateLessonFile(
     id: number,
     fileType: 'video' | 'pdf',
@@ -224,7 +219,6 @@ export class CoursesService {
     return this.findOneLesson(id);
   }
 
->>>>>>> backend
   async removeLesson(id: number, professorId: number): Promise<void> {
     const lesson = await this.findOneLesson(id);
     
@@ -239,8 +233,6 @@ export class CoursesService {
       throw new NotFoundException(`Lección con ID ${id} no encontrada`);
     }
   }
-<<<<<<< HEAD
-=======
 
   async checkCourseAccess(courseId: number, studentId: number): Promise<boolean> {
     const access = await this.courseAccessRepository.findOne({
@@ -252,6 +244,5 @@ export class CoursesService {
     });
     return !!access;
   }
->>>>>>> backend
 }
 
