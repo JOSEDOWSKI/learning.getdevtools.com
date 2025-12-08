@@ -7,16 +7,28 @@ import { api } from '@/lib/api';
 import Layout from '@/components/Layout';
 import Link from 'next/link';
 
+interface CareerCurriculum {
+  id: number;
+  order_index: number;
+  career: {
+    id: number;
+    name: string;
+    status: string;
+  };
+}
+
 interface Course {
   id: number;
   title: string;
   description: string;
   credits: number;
   price: number;
+  base_price?: number;
   professor: {
     id: number;
     full_name: string;
   };
+  careerCurriculums?: CareerCurriculum[];
 }
 
 export default function ProfessorCoursesPage() {
@@ -58,7 +70,21 @@ export default function ProfessorCoursesPage() {
         const myCourses = response.data.filter(
           (course: Course) => course.professor?.id === user?.id
         );
-        setCourses(myCourses);
+        
+        // Para cada curso, obtener los detalles completos (incluyendo carreras)
+        const coursesWithCareers = await Promise.all(
+          myCourses.map(async (course: Course) => {
+            try {
+              const courseDetail = await api.getCourse(course.id);
+              return courseDetail.data || course;
+            } catch (error) {
+              console.error(`Error loading course ${course.id}:`, error);
+              return course;
+            }
+          })
+        );
+        
+        setCourses(coursesWithCareers);
       }
     } catch (error) {
       console.error('Error loading courses:', error);
@@ -175,9 +201,37 @@ export default function ProfessorCoursesPage() {
                 <div className="flex items-center justify-between text-sm text-gray-500 mb-4">
                   <span>📚 {course.credits} créditos</span>
                   <span className="text-lg font-bold text-blue-600">
-                    ${course.price}
+                    S/ {course.base_price || course.price}
                   </span>
                 </div>
+                
+                {/* Mostrar carreras donde está el curso */}
+                {course.careerCurriculums && course.careerCurriculums.length > 0 && (
+                  <div className="mb-4 p-3 bg-blue-50 rounded-lg">
+                    <p className="text-xs font-semibold text-gray-700 mb-2">
+                      🎓 En {course.careerCurriculums.length} {course.careerCurriculums.length === 1 ? 'carrera' : 'carreras'}:
+                    </p>
+                    <div className="space-y-1">
+                      {course.careerCurriculums.map((curriculum) => (
+                        <div key={curriculum.id} className="text-xs text-gray-600">
+                          • {curriculum.career.name} 
+                          <span className="text-gray-400 ml-1">
+                            (Mes {curriculum.order_index})
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                
+                {(!course.careerCurriculums || course.careerCurriculums.length === 0) && (
+                  <div className="mb-4 p-3 bg-yellow-50 rounded-lg">
+                    <p className="text-xs text-yellow-700">
+                      ⚠️ Este curso aún no está asignado a ninguna carrera
+                    </p>
+                  </div>
+                )}
+                
                 <div className="flex space-x-2">
                   <Link
                     href={`/courses/${course.id}`}

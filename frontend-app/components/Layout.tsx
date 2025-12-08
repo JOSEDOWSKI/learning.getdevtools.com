@@ -23,6 +23,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       return [
         { href: '/professor/dashboard', label: 'Dashboard' },
         { href: '/professor/courses', label: 'Mis Cursos' },
+        { href: '/careers', label: 'Carreras' },
         { href: '/professor/submissions', label: 'Entregas' },
       ];
     } else {

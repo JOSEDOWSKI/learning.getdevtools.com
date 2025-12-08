@@ -197,6 +197,15 @@ export default function ProfessorDashboardPage() {
               </p>
             </Link>
             <Link
+              href="/careers"
+              className="p-4 border-2 border-gray-200 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-colors"
+            >
+              <h3 className="font-semibold text-gray-900">Ver Carreras</h3>
+              <p className="text-sm text-gray-600 mt-1">
+                Ver las carreras donde están tus cursos
+              </p>
+            </Link>
+            <Link
               href="/professor/submissions"
               className="p-4 border-2 border-gray-200 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-colors"
             >
