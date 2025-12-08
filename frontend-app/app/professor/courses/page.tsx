@@ -250,6 +250,12 @@ export default function ProfessorCoursesPage() {
                 
                 <div className="flex space-x-2">
                   <Link
+                    href={`/professor/courses/${course.id}/edit`}
+                    className="flex-1 bg-green-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-green-700 transition-colors text-center"
+                  >
+                    Editar Contenido
+                  </Link>
+                  <Link
                     href={`/courses/${course.id}`}
                     className="flex-1 bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors text-center"
                   >

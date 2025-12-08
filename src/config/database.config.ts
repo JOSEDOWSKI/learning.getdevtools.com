@@ -17,6 +17,8 @@ import { AiEvaluation } from '../modules/submissions/entities/ai-evaluation.enti
 import { SkillsMatrix } from '../modules/skills/entities/skills-matrix.entity';
 import { Certificate } from '../modules/certificates/entities/certificate.entity';
 import { AdminAuditLog } from '../modules/admin/entities/admin-audit-log.entity';
+import { Lesson } from '../modules/courses/entities/lesson.entity';
+import { Lesson } from '../modules/courses/entities/lesson.entity';
 
 @Injectable()
 export class DatabaseConfig implements TypeOrmOptionsFactory {
@@ -30,25 +32,26 @@ export class DatabaseConfig implements TypeOrmOptionsFactory {
       username: this.configService.get<string>('DB_USERNAME', 'postgres'),
       password: this.configService.get<string>('DB_PASSWORD', 'postgres'),
       database: this.configService.get<string>('DB_DATABASE', 'learning_platform'),
-      entities: [
-        User,
-        IdentityAudit,
-        PlatformSettings,
-        Wallet,
-        Payout,
-        Career,
-        Course,
-        CareerCurriculum,
-        Transaction,
-        CourseAccess,
-        CompanyAccess,
-        Submission,
-        AiEvaluation,
-        SkillsMatrix,
-        Certificate,
-        AdminAuditLog,
-      ],
-      synchronize: this.configService.get<string>('NODE_ENV') === 'development',
+          entities: [
+            User,
+            IdentityAudit,
+            PlatformSettings,
+            Wallet,
+            Payout,
+            Career,
+            Course,
+            CareerCurriculum,
+            Lesson,
+            Transaction,
+            CourseAccess,
+            CompanyAccess,
+            Submission,
+            AiEvaluation,
+            SkillsMatrix,
+            Certificate,
+            AdminAuditLog,
+          ],
+      synchronize: this.configService.get<string>('NODE_ENV') === 'development' || this.configService.get<string>('NODE_ENV') === 'production',
       logging: this.configService.get<string>('NODE_ENV') === 'development',
     };
   }

@@ -255,6 +255,44 @@ class ApiClient {
     });
   }
 
+  // Lessons Management
+  async getLessons(courseId: number) {
+    return this.request<any[]>(`/courses/courses/${courseId}/lessons`);
+  }
+
+  async getLesson(id: number) {
+    return this.request<any>(`/courses/lessons/${id}`);
+  }
+
+  async createLesson(lessonData: {
+    course_id: number;
+    title: string;
+    content?: string;
+    order_index?: number;
+  }) {
+    return this.request<any>('/courses/lessons', {
+      method: 'POST',
+      body: JSON.stringify(lessonData),
+    });
+  }
+
+  async updateLesson(id: number, lessonData: {
+    title?: string;
+    content?: string;
+    order_index?: number;
+  }) {
+    return this.request<any>(`/courses/lessons/${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify(lessonData),
+    });
+  }
+
+  async deleteLesson(id: number) {
+    return this.request<any>(`/courses/lessons/${id}`, {
+      method: 'DELETE',
+    });
+  }
+
   // User Management (for admin)
   async createUser(userData: {
     dni: string;
