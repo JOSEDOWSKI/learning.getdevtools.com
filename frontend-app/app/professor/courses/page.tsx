@@ -96,11 +96,26 @@ export default function ProfessorCoursesPage() {
   async function handleCreate() {
     if (!user?.id) return;
 
+    // Validar campos requeridos
+    if (!formData.title || formData.title.trim() === '') {
+      alert('El título del curso es requerido');
+      return;
+    }
+
+    if (formData.credits <= 0) {
+      alert('Los créditos deben ser mayor a 0');
+      return;
+    }
+
     try {
       const response = await api.createCourse({
-        ...formData,
         professor_id: user.id,
+        title: formData.title.trim(),
+        description: formData.description || undefined,
+        credits: formData.credits,
+        base_price: formData.price > 0 ? formData.price : undefined,
       });
+      
       if (response.data) {
         await loadCourses();
         setShowCreateModal(false);
@@ -110,12 +125,13 @@ export default function ProfessorCoursesPage() {
           credits: 0,
           price: 0,
         });
+        alert('Curso creado exitosamente');
       } else {
-        alert('Error al crear curso');
+        alert(response.error || 'Error al crear curso');
       }
     } catch (error) {
       console.error('Error creating course:', error);
-      alert('Error al crear curso');
+      alert('Error al crear curso. Verifica la consola para más detalles.');
     }
   }
 
