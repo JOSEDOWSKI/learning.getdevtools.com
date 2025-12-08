@@ -221,12 +221,21 @@ export default function AdminDashboardPage() {
               </p>
             </Link>
             <Link
+              href="/admin/careers"
+              className="p-4 border-2 border-gray-200 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-colors"
+            >
+              <h3 className="font-semibold text-gray-900">Gestionar Carreras</h3>
+              <p className="text-sm text-gray-600 mt-1">
+                Crear planes de carrera y asociar cursos
+              </p>
+            </Link>
+            <Link
               href="/admin/courses"
               className="p-4 border-2 border-gray-200 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-colors"
             >
-              <h3 className="font-semibold text-gray-900">Gestionar Cursos</h3>
+              <h3 className="font-semibold text-gray-900">Ver Todos los Cursos</h3>
               <p className="text-sm text-gray-600 mt-1">
-                Crear, editar y eliminar cursos y carreras
+                Ver todos los cursos creados por profesores
               </p>
             </Link>
             <Link

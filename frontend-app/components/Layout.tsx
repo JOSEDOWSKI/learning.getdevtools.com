@@ -14,6 +14,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       return [
         { href: '/admin/dashboard', label: 'Dashboard' },
         { href: '/admin/users', label: 'Usuarios' },
+        { href: '/admin/careers', label: 'Carreras' },
         { href: '/admin/courses', label: 'Cursos' },
         { href: '/admin/submissions', label: 'Entregas' },
         { href: '/admin/certificates', label: 'Certificados' },

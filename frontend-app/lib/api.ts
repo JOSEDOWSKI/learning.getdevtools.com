@@ -241,6 +241,20 @@ class ApiClient {
     });
   }
 
+  // Career Curriculum Management
+  async addCourseToCareer(careerId: number, courseId: number, orderIndex: number) {
+    return this.request<any>(`/courses/careers/${careerId}/courses/${courseId}`, {
+      method: 'POST',
+      body: JSON.stringify({ orderIndex }),
+    });
+  }
+
+  async removeCourseFromCareer(careerId: number, courseId: number) {
+    return this.request<any>(`/courses/careers/${careerId}/courses/${courseId}`, {
+      method: 'DELETE',
+    });
+  }
+
   // User Management (for admin)
   async createUser(userData: {
     dni: string;
