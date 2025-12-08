@@ -40,6 +40,14 @@ export default function LessonViewPage() {
   const [savingNotes, setSavingNotes] = useState(false);
   const [videoProgress, setVideoProgress] = useState(0);
   const [isVideoCompleted, setIsVideoCompleted] = useState(false);
+  const [isVideoLoading, setIsVideoLoading] = useState(true);
+  const [videoError, setVideoError] = useState<string | null>(null);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [duration, setDuration] = useState(0);
+  const [volume, setVolume] = useState(1);
+  const [isMuted, setIsMuted] = useState(false);
+  const [playbackRate, setPlaybackRate] = useState(1);
 
   useEffect(() => {
     if (!loading && !isAuthenticated) {
@@ -91,7 +99,9 @@ export default function LessonViewPage() {
     const currentTime = video.currentTime;
     const duration = video.duration;
     
-    if (duration > 0) {
+    setCurrentTime(currentTime);
+    if (duration > 0 && !isNaN(duration)) {
+      setDuration(duration);
       const progress = (currentTime / duration) * 100;
       setVideoProgress(progress);
 
@@ -112,6 +122,79 @@ export default function LessonViewPage() {
           progress_percentage: 100,
         });
       }
+    }
+  }
+
+  function handlePlayPause() {
+    if (!videoRef.current) return;
+    if (isPlaying) {
+      videoRef.current.pause();
+    } else {
+      videoRef.current.play();
+    }
+    setIsPlaying(!isPlaying);
+  }
+
+  function handleSeek(e: React.ChangeEvent<HTMLInputElement>) {
+    if (!videoRef.current) return;
+    const newTime = parseFloat(e.target.value);
+    videoRef.current.currentTime = newTime;
+    setCurrentTime(newTime);
+  }
+
+  function handleVolumeChange(e: React.ChangeEvent<HTMLInputElement>) {
+    if (!videoRef.current) return;
+    const newVolume = parseFloat(e.target.value);
+    videoRef.current.volume = newVolume;
+    setVolume(newVolume);
+    setIsMuted(newVolume === 0);
+  }
+
+  function handleMuteToggle() {
+    if (!videoRef.current) return;
+    if (isMuted) {
+      videoRef.current.volume = volume || 0.5;
+      setIsMuted(false);
+    } else {
+      videoRef.current.volume = 0;
+      setIsMuted(true);
+    }
+  }
+
+  function handlePlaybackRateChange(rate: number) {
+    if (!videoRef.current) return;
+    videoRef.current.playbackRate = rate;
+    setPlaybackRate(rate);
+  }
+
+  function formatTime(seconds: number): string {
+    if (isNaN(seconds)) return '0:00';
+    const mins = Math.floor(seconds / 60);
+    const secs = Math.floor(seconds % 60);
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
+  }
+
+  function handleVideoLoadStart() {
+    setIsVideoLoading(true);
+    setVideoError(null);
+  }
+
+  function handleVideoCanPlay() {
+    setIsVideoLoading(false);
+    if (videoRef.current) {
+      setDuration(videoRef.current.duration);
+    }
+  }
+
+  function handleVideoError() {
+    setIsVideoLoading(false);
+    setVideoError('Error al cargar el video. Por favor, intenta recargar la página.');
+  }
+
+  function handleVideoLoadedMetadata() {
+    if (videoRef.current && lesson?.progress?.video_time_watched) {
+      // Restaurar posición anterior si existe
+      videoRef.current.currentTime = lesson.progress.video_time_watched;
     }
   }
 
@@ -194,24 +277,173 @@ export default function LessonViewPage() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Contenido Principal */}
           <div className="lg:col-span-2 space-y-6">
-            {/* Video */}
+            {/* Video Mejorado */}
             {videoUrl && (
-              <div className="bg-white rounded-lg shadow p-4">
-                <h2 className="text-xl font-semibold text-gray-900 mb-4">
+              <div className="bg-white rounded-lg shadow-lg overflow-hidden">
+                <h2 className="text-xl font-semibold text-gray-900 mb-4 p-4 pb-0">
                   Video de la Lección
                 </h2>
-                <div className="relative w-full" style={{ paddingBottom: '56.25%' }}>
+                <div className="relative w-full bg-black" style={{ paddingBottom: '56.25%' }}>
+                  {/* Video Element */}
                   <video
                     ref={videoRef}
-                    controls
-                    className="absolute top-0 left-0 w-full h-full rounded-lg"
+                    className="absolute top-0 left-0 w-full h-full"
                     onTimeUpdate={handleVideoTimeUpdate}
+                    onPlay={() => setIsPlaying(true)}
+                    onPause={() => setIsPlaying(false)}
+                    onLoadStart={handleVideoLoadStart}
+                    onCanPlay={handleVideoCanPlay}
+                    onError={handleVideoError}
+                    onLoadedMetadata={handleVideoLoadedMetadata}
+                    preload="metadata"
+                    playsInline
                     src={videoUrl}
                   >
                     Tu navegador no soporta la reproducción de video.
                   </video>
+
+                  {/* Loading Indicator */}
+                  {isVideoLoading && (
+                    <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50">
+                      <div className="text-center">
+                        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto"></div>
+                        <p className="mt-4 text-white text-sm">Cargando video...</p>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Error Message */}
+                  {videoError && (
+                    <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-75">
+                      <div className="text-center p-4">
+                        <p className="text-red-400 mb-4">{videoError}</p>
+                        <button
+                          onClick={() => {
+                            setVideoError(null);
+                            setIsVideoLoading(true);
+                            if (videoRef.current) {
+                              videoRef.current.load();
+                            }
+                          }}
+                          className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+                        >
+                          Reintentar
+                        </button>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Custom Controls Overlay */}
+                  {!isVideoLoading && !videoError && (
+                    <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-4">
+                      {/* Progress Bar */}
+                      <div className="mb-3">
+                        <input
+                          type="range"
+                          min="0"
+                          max={duration || 0}
+                          value={currentTime}
+                          onChange={handleSeek}
+                          className="w-full h-1 bg-gray-600 rounded-lg appearance-none cursor-pointer slider"
+                          style={{
+                            background: `linear-gradient(to right, #3b82f6 0%, #3b82f6 ${(currentTime / (duration || 1)) * 100}%, #4b5563 ${(currentTime / (duration || 1)) * 100}%, #4b5563 100%)`
+                          }}
+                        />
+                      </div>
+
+                      {/* Controls */}
+                      <div className="flex items-center justify-between text-white">
+                        <div className="flex items-center gap-3">
+                          {/* Play/Pause */}
+                          <button
+                            onClick={handlePlayPause}
+                            className="p-2 hover:bg-white/20 rounded transition-colors"
+                            aria-label={isPlaying ? 'Pausar' : 'Reproducir'}
+                          >
+                            {isPlaying ? (
+                              <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+                                <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zM7 8a1 1 0 012 0v4a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v4a1 1 0 102 0V8a1 1 0 00-1-1z" clipRule="evenodd" />
+                              </svg>
+                            ) : (
+                              <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+                                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clipRule="evenodd" />
+                              </svg>
+                            )}
+                          </button>
+
+                          {/* Volume */}
+                          <div className="flex items-center gap-2">
+                            <button
+                              onClick={handleMuteToggle}
+                              className="p-2 hover:bg-white/20 rounded transition-colors"
+                              aria-label={isMuted ? 'Activar sonido' : 'Silenciar'}
+                            >
+                              {isMuted || volume === 0 ? (
+                                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                                  <path fillRule="evenodd" d="M9.383 3.076A1 1 0 0110 4v12a1 1 0 01-1.617.793L4.383 13H2a1 1 0 01-1-1V8a1 1 0 011-1h2.383l4.617-3.793a1 1 0 011.383-.131zM14.657 2.929a1 1 0 011.414 0A9.972 9.972 0 0119 10a9.972 9.972 0 01-2.929 7.071 1 1 0 01-1.414-1.414A7.971 7.971 0 0017 10c0-2.21-.894-4.208-2.343-5.657a1 1 0 010-1.414zm-2.829 2.828a1 1 0 011.415 0A5.983 5.983 0 0115 10a5.984 5.984 0 01-1.757 4.243 1 1 0 01-1.415-1.415A3.984 3.984 0 0013 10a3.983 3.983 0 00-1.172-2.828 1 1 0 010-1.415z" clipRule="evenodd" />
+                                </svg>
+                              ) : (
+                                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                                  <path fillRule="evenodd" d="M9.383 3.076A1 1 0 0110 4v12a1 1 0 01-1.617.793L4.383 13H2a1 1 0 01-1-1V8a1 1 0 011-1h2.383l4.617-3.793a1 1 0 011.383-.131zM14.657 2.929a1 1 0 011.414 0A9.972 9.972 0 0119 10a9.972 9.972 0 01-2.929 7.071 1 1 0 01-1.414-1.414A7.971 7.971 0 0017 10c0-2.21-.894-4.208-2.343-5.657a1 1 0 010-1.414zm-2.829 2.828a1 1 0 011.415 0A5.983 5.983 0 0115 10a5.984 5.984 0 01-1.757 4.243 1 1 0 01-1.415-1.415A3.984 3.984 0 0013 10a3.983 3.983 0 00-1.172-2.828 1 1 0 010-1.415z" clipRule="evenodd" />
+                                </svg>
+                              )}
+                            </button>
+                            <input
+                              type="range"
+                              min="0"
+                              max="1"
+                              step="0.1"
+                              value={isMuted ? 0 : volume}
+                              onChange={handleVolumeChange}
+                              className="w-20 h-1 bg-gray-600 rounded-lg appearance-none cursor-pointer"
+                            />
+                          </div>
+
+                          {/* Time Display */}
+                          <span className="text-sm font-mono">
+                            {formatTime(currentTime)} / {formatTime(duration)}
+                          </span>
+                        </div>
+
+                        <div className="flex items-center gap-2">
+                          {/* Playback Rate */}
+                          <div className="flex items-center gap-1">
+                            <button
+                              onClick={() => handlePlaybackRateChange(playbackRate === 0.75 ? 1 : playbackRate === 1 ? 1.25 : playbackRate === 1.25 ? 1.5 : playbackRate === 1.5 ? 2 : 0.75)}
+                              className="px-2 py-1 text-sm bg-white/20 hover:bg-white/30 rounded transition-colors"
+                            >
+                              {playbackRate}x
+                            </button>
+                          </div>
+
+                          {/* Fullscreen */}
+                          <button
+                            onClick={() => {
+                              if (videoRef.current) {
+                                if (videoRef.current.requestFullscreen) {
+                                  videoRef.current.requestFullscreen();
+                                }
+                              }
+                            }}
+                            className="p-2 hover:bg-white/20 rounded transition-colors"
+                            aria-label="Pantalla completa"
+                          >
+                            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                              <path d="M3 4a1 1 0 011-1h4a1 1 0 010 2H6.414l2.293 2.293a1 1 0 01-1.414 1.414L5 6.414V8a1 1 0 01-2 0V4zm9 1a1 1 0 010-2h4a1 1 0 011 1v4a1 1 0 01-2 0V6.414l-2.293 2.293a1 1 0 11-1.414-1.414L13.586 5H12zm-9 7a1 1 0 012 0v1.586l2.293-2.293a1 1 0 111.414 1.414L6.414 15H8a1 1 0 010 2H4a1 1 0 01-1-1v-4zm13-1a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 010-2h1.586l-2.293-2.293a1 1 0 111.414-1.414L15 13.586V12a1 1 0 011-1z" />
+                            </svg>
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </div>
-                <div className="mt-4">
+
+                {/* Progress Summary */}
+                <div className="p-4 pt-2">
+                  <div className="flex items-center justify-between text-sm text-gray-600 mb-2">
+                    <span>Progreso de visualización</span>
+                    <span>{Math.round(videoProgress)}%</span>
+                  </div>
                   <div className="w-full bg-gray-200 rounded-full h-2">
                     <div
                       className="bg-blue-600 h-2 rounded-full transition-all"
