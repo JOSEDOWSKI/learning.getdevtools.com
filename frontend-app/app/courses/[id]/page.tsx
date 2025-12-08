@@ -16,6 +16,9 @@ export default function CourseDetailPage() {
   const [loadingCourse, setLoadingCourse] = useState(true);
   const [submissionUrl, setSubmissionUrl] = useState('');
   const [submitting, setSubmitting] = useState(false);
+  const [lessons, setLessons] = useState<any[]>([]);
+  const [courseProgress, setCourseProgress] = useState<any>(null);
+  const [loadingLessons, setLoadingLessons] = useState(false);
 
   useEffect(() => {
     if (!loading && !isAuthenticated) {
@@ -33,6 +36,13 @@ export default function CourseDetailPage() {
       router.push('/courses');
     }
   }, [isAuthenticated, courseId, router]);
+
+  useEffect(() => {
+    if (hasAccess && courseId) {
+      loadLessons();
+      loadCourseProgress();
+    }
+  }, [hasAccess, courseId]);
 
   async function loadCourse() {
     if (!courseId || isNaN(courseId) || courseId <= 0) {
@@ -68,6 +78,33 @@ export default function CourseDetailPage() {
       }
     } catch (error) {
       console.error('Error checking access:', error);
+    }
+  }
+
+  async function loadLessons() {
+    if (!courseId) return;
+    try {
+      setLoadingLessons(true);
+      const response = await api.getLessons(courseId);
+      if (response.data) {
+        setLessons(response.data);
+      }
+    } catch (error) {
+      console.error('Error loading lessons:', error);
+    } finally {
+      setLoadingLessons(false);
+    }
+  }
+
+  async function loadCourseProgress() {
+    if (!courseId) return;
+    try {
+      const response = await api.getCourseProgress(courseId);
+      if (response.data) {
+        setCourseProgress(response.data);
+      }
+    } catch (error) {
+      console.error('Error loading course progress:', error);
     }
   }
 
@@ -162,6 +199,82 @@ export default function CourseDetailPage() {
             )}
 
             {hasAccess && (
+              <div className="bg-white rounded-lg shadow p-6 mb-6">
+                <h2 className="text-xl font-semibold text-gray-900 mb-4">
+                  Lecciones del Curso
+                </h2>
+                {loadingLessons ? (
+                  <div className="text-center py-8">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+                    <p className="mt-2 text-gray-600">Cargando lecciones...</p>
+                  </div>
+                ) : lessons.length === 0 ? (
+                  <p className="text-gray-600 text-center py-8">
+                    No hay lecciones disponibles aún.
+                  </p>
+                ) : (
+                  <div className="space-y-3">
+                    {lessons
+                      .sort((a, b) => a.order_index - b.order_index)
+                      .map((lesson) => {
+                        const progress = courseProgress?.lessons?.find(
+                          (l: any) => l.id === lesson.id
+                        )?.progress;
+                        const progressPercent = progress?.progress_percentage || 0;
+                        const isCompleted = progress?.is_completed || false;
+
+                        return (
+                          <div
+                            key={lesson.id}
+                            className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow"
+                          >
+                            <div className="flex items-center justify-between">
+                              <div className="flex-1">
+                                <div className="flex items-center gap-3 mb-2">
+                                  <span className="text-sm font-medium text-gray-500 bg-gray-100 px-2 py-1 rounded">
+                                    #{lesson.order_index + 1}
+                                  </span>
+                                  <h3 className="text-lg font-semibold text-gray-900">
+                                    {lesson.title}
+                                  </h3>
+                                  {isCompleted && (
+                                    <span className="text-xs text-green-600 font-medium bg-green-100 px-2 py-1 rounded">
+                                      ✓ Completada
+                                    </span>
+                                  )}
+                                </div>
+                                {progressPercent > 0 && (
+                                  <div className="mt-2">
+                                    <div className="w-full bg-gray-200 rounded-full h-1.5">
+                                      <div
+                                        className="bg-blue-600 h-1.5 rounded-full transition-all"
+                                        style={{ width: `${progressPercent}%` }}
+                                      ></div>
+                                    </div>
+                                    <p className="text-xs text-gray-500 mt-1">
+                                      {Math.round(progressPercent)}% completado
+                                    </p>
+                                  </div>
+                                )}
+                              </div>
+                              <button
+                                onClick={() =>
+                                  router.push(`/courses/${courseId}/lessons/${lesson.id}`)
+                                }
+                                className="ml-4 bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors"
+                              >
+                                {progressPercent > 0 ? 'Continuar' : 'Comenzar'}
+                              </button>
+                            </div>
+                          </div>
+                        );
+                      })}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {hasAccess && (
               <div className="bg-white rounded-lg shadow p-6">
                 <h2 className="text-xl font-semibold text-gray-900 mb-4">
                   Enviar Entrega
@@ -222,10 +335,29 @@ export default function CourseDetailPage() {
                   </p>
                 </div>
                 {hasAccess && (
-                  <div className="pt-4 border-t">
+                  <div className="pt-4 border-t space-y-3">
                     <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">
                       ✓ Tienes acceso
                     </span>
+                    {courseProgress && (
+                      <div>
+                        <div className="flex justify-between text-sm mb-1">
+                          <span className="text-gray-600">Progreso del Curso</span>
+                          <span className="font-medium">
+                            {courseProgress.completedLessons} / {courseProgress.totalLessons} lecciones
+                          </span>
+                        </div>
+                        <div className="w-full bg-gray-200 rounded-full h-2">
+                          <div
+                            className="bg-green-600 h-2 rounded-full transition-all"
+                            style={{ width: `${courseProgress.overallProgress}%` }}
+                          ></div>
+                        </div>
+                        <p className="text-xs text-gray-500 mt-1">
+                          {Math.round(courseProgress.overallProgress)}% completado
+                        </p>
+                      </div>
+                    )}
                   </div>
                 )}
               </div>

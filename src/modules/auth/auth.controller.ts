@@ -6,6 +6,7 @@ import {
   Request,
   HttpCode,
   HttpStatus,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { AuthService } from './auth.service';
@@ -26,7 +27,15 @@ export class AuthController {
   @Post('login')
   @HttpCode(HttpStatus.OK)
   async login(@Request() req, @Body() loginDto: LoginDto) {
-    return this.authService.login(req.user);
+    try {
+      if (!req.user) {
+        throw new UnauthorizedException('Credenciales inválidas');
+      }
+      return this.authService.login(req.user);
+    } catch (error) {
+      console.error('Login error:', error);
+      throw error;
+    }
   }
 
   @UseGuards(AuthGuard('jwt'))

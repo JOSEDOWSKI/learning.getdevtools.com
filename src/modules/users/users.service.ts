@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User, UserRole } from './entities/user.entity';
 import { Wallet } from '../wallets/entities/wallet.entity';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UsersService {
@@ -14,8 +15,15 @@ export class UsersService {
   ) {}
 
   async create(userData: Partial<User>): Promise<User> {
+    // Hashear la contraseña si se proporciona y no está ya hasheada
+    let hashedPassword = userData.password;
+    if (userData.password && !userData.password.startsWith('$2b$')) {
+      hashedPassword = await bcrypt.hash(userData.password, 10);
+    }
+
     const user = this.userRepository.create({
       ...userData,
+      password: hashedPassword,
       role: (userData.role as UserRole) || UserRole.ALUMNO,
     });
     const savedUser = await this.userRepository.save(user);

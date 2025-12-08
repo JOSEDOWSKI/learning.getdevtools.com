@@ -10,6 +10,13 @@ interface Lesson {
   id: number;
   title: string;
   content: string;
+<<<<<<< HEAD
+=======
+  video_url: string | null;
+  pdf_url: string | null;
+  video_filename: string | null;
+  pdf_filename: string | null;
+>>>>>>> backend
   order_index: number;
   course_id: number;
 }
@@ -40,6 +47,11 @@ export default function EditCoursePage() {
     order_index: 0,
   });
   const [saving, setSaving] = useState(false);
+<<<<<<< HEAD
+=======
+  const [uploadingVideo, setUploadingVideo] = useState<number | null>(null);
+  const [uploadingPdf, setUploadingPdf] = useState<number | null>(null);
+>>>>>>> backend
 
   useEffect(() => {
     if (!loading && !isAuthenticated) {
@@ -68,7 +80,10 @@ export default function EditCoursePage() {
       setLoadingCourse(true);
       const response = await api.getCourse(courseId);
       if (response.data) {
+<<<<<<< HEAD
         // Verificar que el curso pertenece al profesor
+=======
+>>>>>>> backend
         if (response.data.professor_id !== user?.id) {
           alert('No tienes permiso para editar este curso');
           router.push('/professor/courses');
@@ -129,7 +144,10 @@ export default function EditCoursePage() {
     setSaving(true);
     try {
       if (editingLesson) {
+<<<<<<< HEAD
         // Actualizar lección existente
+=======
+>>>>>>> backend
         const response = await api.updateLesson(editingLesson.id, {
           title: lessonForm.title.trim(),
           content: lessonForm.content.trim() || undefined,
@@ -142,7 +160,10 @@ export default function EditCoursePage() {
           alert(response.error || 'Error al actualizar lección');
         }
       } else {
+<<<<<<< HEAD
         // Crear nueva lección
+=======
+>>>>>>> backend
         const response = await api.createLesson({
           course_id: courseId,
           title: lessonForm.title.trim(),
@@ -164,6 +185,39 @@ export default function EditCoursePage() {
     }
   }
 
+<<<<<<< HEAD
+=======
+  async function handleFileUpload(lessonId: number, file: File, type: 'video' | 'pdf') {
+    if (type === 'video') {
+      setUploadingVideo(lessonId);
+    } else {
+      setUploadingPdf(lessonId);
+    }
+
+    try {
+      const response = type === 'video' 
+        ? await api.uploadVideo(lessonId, file)
+        : await api.uploadPdf(lessonId, file);
+
+      if (response.data) {
+        alert(`${type === 'video' ? 'Video' : 'PDF'} subido exitosamente`);
+        await loadLessons();
+      } else {
+        alert(response.error || `Error al subir ${type === 'video' ? 'video' : 'PDF'}`);
+      }
+    } catch (error) {
+      console.error(`Error uploading ${type}:`, error);
+      alert(`Error al subir ${type === 'video' ? 'video' : 'PDF'}`);
+    } finally {
+      if (type === 'video') {
+        setUploadingVideo(null);
+      } else {
+        setUploadingPdf(null);
+      }
+    }
+  }
+
+>>>>>>> backend
   async function handleDeleteLesson(lessonId: number) {
     if (!confirm('¿Estás seguro de eliminar esta lección?')) return;
 
@@ -259,10 +313,56 @@ export default function EditCoursePage() {
                         </h3>
                       </div>
                       {lesson.content && (
+<<<<<<< HEAD
                         <p className="text-gray-600 text-sm line-clamp-2">
                           {lesson.content}
                         </p>
                       )}
+=======
+                        <p className="text-gray-600 text-sm line-clamp-2 mb-3">
+                          {lesson.content}
+                        </p>
+                      )}
+                      <div className="flex gap-4 mt-3">
+                        {lesson.video_url ? (
+                          <span className="text-sm text-green-600">✓ Video subido</span>
+                        ) : (
+                          <label className="text-sm text-blue-600 cursor-pointer hover:text-blue-700">
+                            📹 Subir Video
+                            <input
+                              type="file"
+                              accept="video/*"
+                              className="hidden"
+                              onChange={(e) => {
+                                const file = e.target.files?.[0];
+                                if (file) handleFileUpload(lesson.id, file, 'video');
+                              }}
+                              disabled={uploadingVideo === lesson.id}
+                            />
+                          </label>
+                        )}
+                        {lesson.pdf_url ? (
+                          <span className="text-sm text-green-600">✓ PDF subido</span>
+                        ) : (
+                          <label className="text-sm text-blue-600 cursor-pointer hover:text-blue-700">
+                            📄 Subir PDF
+                            <input
+                              type="file"
+                              accept="application/pdf"
+                              className="hidden"
+                              onChange={(e) => {
+                                const file = e.target.files?.[0];
+                                if (file) handleFileUpload(lesson.id, file, 'pdf');
+                              }}
+                              disabled={uploadingPdf === lesson.id}
+                            />
+                          </label>
+                        )}
+                        {(uploadingVideo === lesson.id || uploadingPdf === lesson.id) && (
+                          <span className="text-sm text-gray-500">Subiendo...</span>
+                        )}
+                      </div>
+>>>>>>> backend
                     </div>
                     <div className="flex gap-2 ml-4">
                       <button

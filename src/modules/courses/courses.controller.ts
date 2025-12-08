@@ -7,8 +7,13 @@ import {
   Param,
   Delete,
   UseGuards,
+<<<<<<< HEAD
   Request,
   BadRequestException,
+=======
+  BadRequestException,
+  Request,
+>>>>>>> backend
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { CoursesService } from './courses.service';
@@ -36,19 +41,31 @@ export class CoursesController {
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.coursesService.findOne(+id);
+    const courseId = parseInt(id, 10);
+    if (isNaN(courseId) || courseId <= 0) {
+      throw new BadRequestException('ID de curso inválido');
+    }
+    return this.coursesService.findOne(courseId);
   }
 
   @UseGuards(AuthGuard('jwt'))
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateCourseDto: UpdateCourseDto) {
-    return this.coursesService.update(+id, updateCourseDto);
+    const courseId = parseInt(id, 10);
+    if (isNaN(courseId) || courseId <= 0) {
+      throw new BadRequestException('ID de curso inválido');
+    }
+    return this.coursesService.update(courseId, updateCourseDto);
   }
 
   @UseGuards(AuthGuard('jwt'))
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.coursesService.remove(+id);
+    const courseId = parseInt(id, 10);
+    if (isNaN(courseId) || courseId <= 0) {
+      throw new BadRequestException('ID de curso inválido');
+    }
+    return this.coursesService.remove(courseId);
   }
 
   // Careers endpoints
@@ -65,19 +82,31 @@ export class CoursesController {
 
   @Get('careers/:id')
   findOneCareer(@Param('id') id: string) {
-    return this.coursesService.findOneCareer(+id);
+    const careerId = parseInt(id, 10);
+    if (isNaN(careerId) || careerId <= 0) {
+      throw new BadRequestException('ID de carrera inválido');
+    }
+    return this.coursesService.findOneCareer(careerId);
   }
 
   @UseGuards(AuthGuard('jwt'))
   @Patch('careers/:id')
   updateCareer(@Param('id') id: string, @Body() updateCareerDto: UpdateCareerDto) {
-    return this.coursesService.updateCareer(+id, updateCareerDto);
+    const careerId = parseInt(id, 10);
+    if (isNaN(careerId) || careerId <= 0) {
+      throw new BadRequestException('ID de carrera inválido');
+    }
+    return this.coursesService.updateCareer(careerId, updateCareerDto);
   }
 
   @UseGuards(AuthGuard('jwt'))
   @Delete('careers/:id')
   removeCareer(@Param('id') id: string) {
-    return this.coursesService.removeCareer(+id);
+    const careerId = parseInt(id, 10);
+    if (isNaN(careerId) || careerId <= 0) {
+      throw new BadRequestException('ID de carrera inválido');
+    }
+    return this.coursesService.removeCareer(careerId);
   }
 
   // Curriculum endpoints
@@ -88,7 +117,15 @@ export class CoursesController {
     @Param('courseId') courseId: string,
     @Body('orderIndex') orderIndex: number,
   ) {
-    return this.coursesService.addCourseToCareer(+careerId, +courseId, orderIndex);
+    const parsedCareerId = parseInt(careerId, 10);
+    const parsedCourseId = parseInt(courseId, 10);
+    if (isNaN(parsedCareerId) || parsedCareerId <= 0) {
+      throw new BadRequestException('ID de carrera inválido');
+    }
+    if (isNaN(parsedCourseId) || parsedCourseId <= 0) {
+      throw new BadRequestException('ID de curso inválido');
+    }
+    return this.coursesService.addCourseToCareer(parsedCareerId, parsedCourseId, orderIndex);
   }
 
   @UseGuards(AuthGuard('jwt'))
@@ -97,7 +134,67 @@ export class CoursesController {
     @Param('careerId') careerId: string,
     @Param('courseId') courseId: string,
   ) {
-    return this.coursesService.removeCourseFromCareer(+careerId, +courseId);
+    const parsedCareerId = parseInt(careerId, 10);
+    const parsedCourseId = parseInt(courseId, 10);
+    if (isNaN(parsedCareerId) || parsedCareerId <= 0) {
+      throw new BadRequestException('ID de carrera inválido');
+    }
+    if (isNaN(parsedCourseId) || parsedCourseId <= 0) {
+      throw new BadRequestException('ID de curso inválido');
+    }
+    return this.coursesService.removeCourseFromCareer(parsedCareerId, parsedCourseId);
+  }
+
+  // Lessons endpoints
+  @UseGuards(AuthGuard('jwt'))
+  @Post('lessons')
+  createLesson(@Body() createLessonDto: CreateLessonDto, @Request() req) {
+    const professorId = req.user.sub;
+    return this.coursesService.createLesson(createLessonDto, professorId);
+  }
+
+  @Get('courses/:courseId/lessons')
+  findAllLessons(@Param('courseId') courseId: string) {
+    const courseIdNum = parseInt(courseId, 10);
+    if (isNaN(courseIdNum) || courseIdNum <= 0) {
+      throw new BadRequestException('ID de curso inválido');
+    }
+    return this.coursesService.findAllLessons(courseIdNum);
+  }
+
+  @Get('lessons/:id')
+  findOneLesson(@Param('id') id: string) {
+    const lessonId = parseInt(id, 10);
+    if (isNaN(lessonId) || lessonId <= 0) {
+      throw new BadRequestException('ID de lección inválido');
+    }
+    return this.coursesService.findOneLesson(lessonId);
+  }
+
+  @UseGuards(AuthGuard('jwt'))
+  @Patch('lessons/:id')
+  updateLesson(
+    @Param('id') id: string,
+    @Body() updateLessonDto: UpdateLessonDto,
+    @Request() req,
+  ) {
+    const lessonId = parseInt(id, 10);
+    if (isNaN(lessonId) || lessonId <= 0) {
+      throw new BadRequestException('ID de lección inválido');
+    }
+    const professorId = req.user.sub;
+    return this.coursesService.updateLesson(lessonId, updateLessonDto, professorId);
+  }
+
+  @UseGuards(AuthGuard('jwt'))
+  @Delete('lessons/:id')
+  removeLesson(@Param('id') id: string, @Request() req) {
+    const lessonId = parseInt(id, 10);
+    if (isNaN(lessonId) || lessonId <= 0) {
+      throw new BadRequestException('ID de lección inválido');
+    }
+    const professorId = req.user.sub;
+    return this.coursesService.removeLesson(lessonId, professorId);
   }
 
   // Lessons endpoints

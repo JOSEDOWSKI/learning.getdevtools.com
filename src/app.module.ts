@@ -10,6 +10,8 @@ import { CoursesModule } from './modules/courses/courses.module';
 import { SubmissionsModule } from './modules/submissions/submissions.module';
 import { CertificatesModule } from './modules/certificates/certificates.module';
 import { AccessModule } from './modules/access/access.module';
+import { FilesModule } from './modules/files/files.module';
+import { LessonsModule } from './modules/lessons/lessons.module';
 
 @Module({
   imports: [
@@ -26,6 +28,8 @@ import { AccessModule } from './modules/access/access.module';
     SubmissionsModule,
     CertificatesModule,
     AccessModule,
+    FilesModule,
+    LessonsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

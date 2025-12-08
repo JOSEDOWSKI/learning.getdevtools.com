@@ -3,6 +3,10 @@ import {
   PrimaryGeneratedColumn,
   Column,
   ManyToOne,
+<<<<<<< HEAD
+=======
+  OneToMany,
+>>>>>>> backend
   JoinColumn,
   CreateDateColumn,
   UpdateDateColumn,
@@ -27,6 +31,21 @@ export class Lesson {
   @Column({ type: 'text', nullable: true })
   content: string;
 
+<<<<<<< HEAD
+=======
+  @Column({ type: 'varchar', nullable: true })
+  video_url: string;
+
+  @Column({ type: 'varchar', nullable: true })
+  pdf_url: string;
+
+  @Column({ type: 'varchar', nullable: true })
+  video_filename: string;
+
+  @Column({ type: 'varchar', nullable: true })
+  pdf_filename: string;
+
+>>>>>>> backend
   @Column({ type: 'int', default: 0 })
   order_index: number;
 

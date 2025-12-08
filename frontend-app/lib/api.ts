@@ -178,6 +178,7 @@ class ApiClient {
     );
   }
 
+<<<<<<< HEAD
   // Admin & Users
   async getUsers() {
     return this.request<any[]>('/users');
@@ -256,6 +257,9 @@ class ApiClient {
   }
 
   // Lessons Management
+=======
+  // Lessons
+>>>>>>> backend
   async getLessons(courseId: number) {
     return this.request<any[]>(`/courses/courses/${courseId}/lessons`);
   }
@@ -293,6 +297,7 @@ class ApiClient {
     });
   }
 
+<<<<<<< HEAD
   // User Management (for admin)
   async createUser(userData: {
     dni: string;
@@ -306,6 +311,103 @@ class ApiClient {
       body: JSON.stringify(userData),
     });
   }
+=======
+  // File Uploads
+  async uploadVideo(lessonId: number, file: File): Promise<ApiResponse<any>> {
+    const formData = new FormData();
+    formData.append('video', file);
+
+    const headers: Record<string, string> = {};
+    if (this.token) {
+      headers['Authorization'] = `Bearer ${this.token}`;
+    }
+
+    try {
+      const response = await fetch(`${this.baseUrl}/files/lessons/${lessonId}/video`, {
+        method: 'POST',
+        headers,
+        body: formData,
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        return {
+          error: data.message || `Error ${response.status}`,
+        };
+      }
+
+      return { data };
+    } catch (error) {
+      return {
+        error: error instanceof Error ? error.message : 'Error de conexión',
+      };
+    }
+  }
+
+  async uploadPdf(lessonId: number, file: File): Promise<ApiResponse<any>> {
+    const formData = new FormData();
+    formData.append('pdf', file);
+
+    const headers: Record<string, string> = {};
+    if (this.token) {
+      headers['Authorization'] = `Bearer ${this.token}`;
+    }
+
+    try {
+      const response = await fetch(`${this.baseUrl}/files/lessons/${lessonId}/pdf`, {
+        method: 'POST',
+        headers,
+        body: formData,
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        return {
+          error: data.message || `Error ${response.status}`,
+        };
+      }
+
+      return { data };
+    } catch (error) {
+      return {
+        error: error instanceof Error ? error.message : 'Error de conexión',
+      };
+    }
+  }
+
+  getFileUrl(filename: string, type: 'video' | 'pdf'): string {
+    return `${this.baseUrl}/files/${type}s/${filename}`;
+  }
+
+  // Lesson Progress
+  async getLesson(lessonId: number) {
+    return this.request<any>(`/lessons/${lessonId}`);
+  }
+
+  async updateLessonProgress(lessonId: number, data: {
+    is_completed?: boolean;
+    progress_percentage?: number;
+    video_time_watched?: number;
+  }) {
+    return this.request<any>(`/lessons/${lessonId}/progress`, {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    });
+  }
+
+  async updateLessonNotes(lessonId: number, notes: string) {
+    return this.request<any>(`/lessons/${lessonId}/notes`, {
+      method: 'POST',
+      body: JSON.stringify({ notes }),
+    });
+  }
+
+  async getCourseProgress(courseId: number) {
+    return this.request<any>(`/lessons/course/${courseId}/progress`);
+  }
+>>>>>>> backend
 }
 
 export const api = new ApiClient();

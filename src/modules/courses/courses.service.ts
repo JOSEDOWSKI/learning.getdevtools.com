@@ -12,6 +12,7 @@ import { UpdateCareerDto } from './dto/update-career.dto';
 import { CreateLessonDto } from './dto/create-lesson.dto';
 import { UpdateLessonDto } from './dto/update-lesson.dto';
 import { CareerStatus } from './entities/career.entity';
+import { CourseAccess } from '../access/entities/course-access.entity';
 
 @Injectable()
 export class CoursesService {
@@ -24,6 +25,11 @@ export class CoursesService {
     private curriculumRepository: Repository<CareerCurriculum>,
     @InjectRepository(Lesson)
     private lessonRepository: Repository<Lesson>,
+<<<<<<< HEAD
+=======
+    @InjectRepository(CourseAccess)
+    private courseAccessRepository: Repository<CourseAccess>,
+>>>>>>> backend
   ) {}
 
   // Courses
@@ -188,6 +194,37 @@ export class CoursesService {
     return this.findOneLesson(id);
   }
 
+<<<<<<< HEAD
+=======
+  async updateLessonFile(
+    id: number,
+    fileType: 'video' | 'pdf',
+    fileUrl: string,
+    filename: string,
+    professorId: number,
+  ): Promise<Lesson> {
+    const lesson = await this.findOneLesson(id);
+    
+    // Verificar que el curso pertenece al profesor
+    const course = await this.findOne(lesson.course_id);
+    if (course.professor_id !== professorId) {
+      throw new ForbiddenException('No tienes permiso para editar esta lección');
+    }
+
+    const updateData: any = {};
+    if (fileType === 'video') {
+      updateData.video_url = fileUrl;
+      updateData.video_filename = filename;
+    } else {
+      updateData.pdf_url = fileUrl;
+      updateData.pdf_filename = filename;
+    }
+
+    await this.lessonRepository.update(id, updateData);
+    return this.findOneLesson(id);
+  }
+
+>>>>>>> backend
   async removeLesson(id: number, professorId: number): Promise<void> {
     const lesson = await this.findOneLesson(id);
     
@@ -202,5 +239,19 @@ export class CoursesService {
       throw new NotFoundException(`Lección con ID ${id} no encontrada`);
     }
   }
+<<<<<<< HEAD
+=======
+
+  async checkCourseAccess(courseId: number, studentId: number): Promise<boolean> {
+    const access = await this.courseAccessRepository.findOne({
+      where: {
+        student_id: studentId,
+        course_id: courseId,
+        is_active: true,
+      },
+    });
+    return !!access;
+  }
+>>>>>>> backend
 }
 
