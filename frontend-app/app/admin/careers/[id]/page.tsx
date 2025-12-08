@@ -80,7 +80,7 @@ export default function CareerPlanPage() {
         setCareer(careerRes.data);
         // Calcular el siguiente order_index
         const maxOrder = Math.max(
-          ...(careerRes.data.curriculum?.map((c) => c.order_index) || [0]),
+          ...(careerRes.data.curriculum?.map((c: { order_index: number }) => c.order_index) || [0]),
           0
         );
         setOrderIndex(maxOrder + 1);
@@ -140,14 +140,14 @@ export default function CareerPlanPage() {
   }
 
   // Obtener cursos que ya están en la carrera
-  const coursesInCareer = career?.curriculum?.map((c) => c.course_id) || [];
+  const coursesInCareer = career?.curriculum?.map((c: { course_id: number }) => c.course_id) || [];
   const availableCourses = allCourses.filter(
     (course) => !coursesInCareer.includes(course.id)
   );
 
   // Ordenar curriculum por order_index
   const sortedCurriculum = career?.curriculum
-    ? [...career.curriculum].sort((a, b) => a.order_index - b.order_index)
+    ? [...career.curriculum].sort((a: { order_index: number }, b: { order_index: number }) => a.order_index - b.order_index)
     : [];
 
   if (loading || loadingData) {
