@@ -13,6 +13,7 @@ import { Submission } from '../../submissions/entities/submission.entity';
 import { Certificate } from '../../certificates/entities/certificate.entity';
 import { CompanyAccess } from '../../access/entities/company-access.entity';
 import { Transaction } from '../../transactions/entities/transaction.entity';
+import { Lesson } from './lesson.entity';
 
 @Entity('courses')
 export class Course {
@@ -64,5 +65,8 @@ export class Course {
 
   @OneToMany(() => Transaction, (transaction) => transaction.course)
   transactions: Transaction[];
+
+  @OneToMany(() => Lesson, (lesson) => lesson.course)
+  lessons: Lesson[];
 }
 

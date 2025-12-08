@@ -17,6 +17,8 @@ import { AiEvaluation } from '../modules/submissions/entities/ai-evaluation.enti
 import { SkillsMatrix } from '../modules/skills/entities/skills-matrix.entity';
 import { Certificate } from '../modules/certificates/entities/certificate.entity';
 import { AdminAuditLog } from '../modules/admin/entities/admin-audit-log.entity';
+import { Lesson } from '../modules/courses/entities/lesson.entity';
+import { LessonProgress } from '../modules/lessons/entities/lesson-progress.entity';
 
 @Injectable()
 export class DatabaseConfig implements TypeOrmOptionsFactory {
@@ -39,6 +41,8 @@ export class DatabaseConfig implements TypeOrmOptionsFactory {
         Career,
         Course,
         CareerCurriculum,
+        Lesson,
+        LessonProgress,
         Transaction,
         CourseAccess,
         CompanyAccess,

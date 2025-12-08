@@ -22,6 +22,9 @@ RUN npm run build
 # Eliminar dependencias de desarrollo después del build
 RUN npm prune --production
 
+# Crear directorio para uploads
+RUN mkdir -p /app/uploads/videos /app/uploads/pdfs
+
 # Exponer puerto
 EXPOSE 3000
 
