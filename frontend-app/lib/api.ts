@@ -78,6 +78,8 @@ class ApiClient {
     full_name: string;
     email: string;
     password: string;
+    role?: string;
+    invite_code?: string;
   }) {
     return this.request<{ access_token: string; user: any }>(
       '/auth/register',
