@@ -19,6 +19,8 @@ interface AuthContextType {
     full_name: string;
     email: string;
     password: string;
+    role?: string;
+    invite_code?: string;
   }) => Promise<boolean>;
   logout: () => void;
   isAuthenticated: boolean;
@@ -93,6 +95,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     full_name: string;
     email: string;
     password: string;
+    role?: string;
+    invite_code?: string;
   }): Promise<boolean> {
     try {
       const response = await api.register(userData);
