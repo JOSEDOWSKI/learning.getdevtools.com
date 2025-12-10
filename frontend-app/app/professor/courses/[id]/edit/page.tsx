@@ -10,13 +10,10 @@ interface Lesson {
   id: number;
   title: string;
   content: string;
-<<<<<<< HEAD
-=======
   video_url: string | null;
   pdf_url: string | null;
   video_filename: string | null;
   pdf_filename: string | null;
->>>>>>> backend
   order_index: number;
   course_id: number;
 }

@@ -178,7 +178,6 @@ class ApiClient {
     );
   }
 
-<<<<<<< HEAD
   // Admin & Users
   async getUsers() {
     return this.request<any[]>('/users');
@@ -257,11 +256,8 @@ class ApiClient {
   }
 
   // Lessons Management
-=======
-  // Lessons
->>>>>>> backend
   async getLessons(courseId: number) {
-    return this.request<any[]>(`/courses/courses/${courseId}/lessons`);
+    return this.request<any[]>(`/courses/${courseId}/lessons`);
   }
 
   async getLesson(id: number) {
@@ -274,7 +270,7 @@ class ApiClient {
     content?: string;
     order_index?: number;
   }) {
-    return this.request<any>('/courses/lessons', {
+    return this.request<any>(`/courses/${lessonData.course_id}/lessons`, {
       method: 'POST',
       body: JSON.stringify(lessonData),
     });
@@ -297,7 +293,6 @@ class ApiClient {
     });
   }
 
-<<<<<<< HEAD
   // User Management (for admin)
   async createUser(userData: {
     dni: string;
@@ -311,7 +306,6 @@ class ApiClient {
       body: JSON.stringify(userData),
     });
   }
-=======
   // File Uploads
   async uploadVideo(lessonId: number, file: File): Promise<ApiResponse<any>> {
     const formData = new FormData();
@@ -382,7 +376,7 @@ class ApiClient {
   }
 
   // Lesson Progress
-  async getLesson(lessonId: number) {
+  async getLessonWithProgress(lessonId: number) {
     return this.request<any>(`/lessons/${lessonId}`);
   }
 
@@ -407,7 +401,6 @@ class ApiClient {
   async getCourseProgress(courseId: number) {
     return this.request<any>(`/lessons/course/${courseId}/progress`);
   }
->>>>>>> backend
 }
 
 export const api = new ApiClient();
