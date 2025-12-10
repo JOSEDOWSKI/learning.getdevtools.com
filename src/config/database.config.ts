@@ -25,13 +25,35 @@ export class DatabaseConfig implements TypeOrmOptionsFactory {
   constructor(private configService: ConfigService) {}
 
   createTypeOrmOptions(): TypeOrmModuleOptions {
+    const dbHost = this.configService.get<string>('DB_HOST');
+    const dbPort = this.configService.get<number>('DB_PORT', 5432);
+    const dbUsername = this.configService.get<string>('DB_USERNAME', 'postgres');
+    const dbPassword = this.configService.get<string>('DB_PASSWORD', 'postgres');
+    const dbDatabase = this.configService.get<string>('DB_DATABASE', 'learning_platform');
+    const nodeEnv = this.configService.get<string>('NODE_ENV', 'development');
+
+    // Logging para diagnóstico
+    console.log('🔍 Database Configuration:');
+    console.log(`  DB_HOST: ${dbHost || 'NOT SET (using localhost fallback)'}`);
+    console.log(`  DB_PORT: ${dbPort}`);
+    console.log(`  DB_USERNAME: ${dbUsername}`);
+    console.log(`  DB_DATABASE: ${dbDatabase}`);
+    console.log(`  NODE_ENV: ${nodeEnv}`);
+
+    // En producción, no usar localhost como fallback
+    if (nodeEnv === 'production' && (!dbHost || dbHost === 'localhost')) {
+      console.error('❌ ERROR: DB_HOST no está configurado en producción!');
+      console.error('   Configura DB_HOST=srv-captain--postgresqllearning en CapRover');
+      throw new Error('DB_HOST must be configured in production environment');
+    }
+
     return {
       type: 'postgres',
-      host: this.configService.get<string>('DB_HOST', 'localhost'),
-      port: this.configService.get<number>('DB_PORT', 5432),
-      username: this.configService.get<string>('DB_USERNAME', 'postgres'),
-      password: this.configService.get<string>('DB_PASSWORD', 'postgres'),
-      database: this.configService.get<string>('DB_DATABASE', 'learning_platform'),
+      host: dbHost || 'localhost',
+      port: dbPort,
+      username: dbUsername,
+      password: dbPassword,
+      database: dbDatabase,
       entities: [
         User,
         IdentityAudit,
