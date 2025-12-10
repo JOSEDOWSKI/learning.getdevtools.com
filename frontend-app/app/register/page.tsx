@@ -15,14 +15,22 @@ export default function RegisterPage() {
   });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const { register, isAuthenticated, loading: authLoading } = useAuth();
+  const { register, isAuthenticated, loading: authLoading, user } = useAuth();
   const router = useRouter();
 
   useEffect(() => {
     if (isAuthenticated && !authLoading) {
-      router.push('/dashboard');
+      // Redirigir según el rol
+      const role = user?.role;
+      if (role === 'super_admin') {
+        router.push('/admin/dashboard');
+      } else if (role === 'profesor') {
+        router.push('/professor/dashboard');
+      } else {
+        router.push('/dashboard');
+      }
     }
-  }, [isAuthenticated, authLoading, router]);
+  }, [isAuthenticated, authLoading, router, user]);
 
   if (authLoading) {
     return (
@@ -36,7 +44,14 @@ export default function RegisterPage() {
   }
 
   if (isAuthenticated) {
-    return null;
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-500 to-purple-600">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto"></div>
+          <p className="mt-4 text-white">Redirigiendo...</p>
+        </div>
+      </div>
+    );
   }
 
   async function handleSubmit(e: React.FormEvent) {
