@@ -44,11 +44,8 @@ export default function EditCoursePage() {
     order_index: 0,
   });
   const [saving, setSaving] = useState(false);
-<<<<<<< HEAD
-=======
   const [uploadingVideo, setUploadingVideo] = useState<number | null>(null);
   const [uploadingPdf, setUploadingPdf] = useState<number | null>(null);
->>>>>>> backend
 
   useEffect(() => {
     if (!loading && !isAuthenticated) {
@@ -77,10 +74,7 @@ export default function EditCoursePage() {
       setLoadingCourse(true);
       const response = await api.getCourse(courseId);
       if (response.data) {
-<<<<<<< HEAD
         // Verificar que el curso pertenece al profesor
-=======
->>>>>>> backend
         if (response.data.professor_id !== user?.id) {
           alert('No tienes permiso para editar este curso');
           router.push('/professor/courses');
@@ -141,10 +135,7 @@ export default function EditCoursePage() {
     setSaving(true);
     try {
       if (editingLesson) {
-<<<<<<< HEAD
         // Actualizar lección existente
-=======
->>>>>>> backend
         const response = await api.updateLesson(editingLesson.id, {
           title: lessonForm.title.trim(),
           content: lessonForm.content.trim() || undefined,
@@ -157,10 +148,7 @@ export default function EditCoursePage() {
           alert(response.error || 'Error al actualizar lección');
         }
       } else {
-<<<<<<< HEAD
         // Crear nueva lección
-=======
->>>>>>> backend
         const response = await api.createLesson({
           course_id: courseId,
           title: lessonForm.title.trim(),
@@ -182,8 +170,6 @@ export default function EditCoursePage() {
     }
   }
 
-<<<<<<< HEAD
-=======
   async function handleFileUpload(lessonId: number, file: File, type: 'video' | 'pdf') {
     if (type === 'video') {
       setUploadingVideo(lessonId);
@@ -214,7 +200,6 @@ export default function EditCoursePage() {
     }
   }
 
->>>>>>> backend
   async function handleDeleteLesson(lessonId: number) {
     if (!confirm('¿Estás seguro de eliminar esta lección?')) return;
 
@@ -310,12 +295,6 @@ export default function EditCoursePage() {
                         </h3>
                       </div>
                       {lesson.content && (
-<<<<<<< HEAD
-                        <p className="text-gray-600 text-sm line-clamp-2">
-                          {lesson.content}
-                        </p>
-                      )}
-=======
                         <p className="text-gray-600 text-sm line-clamp-2 mb-3">
                           {lesson.content}
                         </p>
@@ -359,7 +338,6 @@ export default function EditCoursePage() {
                           <span className="text-sm text-gray-500">Subiendo...</span>
                         )}
                       </div>
->>>>>>> backend
                     </div>
                     <div className="flex gap-2 ml-4">
                       <button
