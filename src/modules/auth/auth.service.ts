@@ -1,14 +1,16 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable, UnauthorizedException, BadRequestException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UsersService } from '../users/users.service';
 import { UserRole } from '../users/entities/user.entity';
 import * as bcrypt from 'bcrypt';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class AuthService {
   constructor(
     private usersService: UsersService,
     private jwtService: JwtService,
+    private configService: ConfigService,
   ) {}
 
   async validateUser(email: string, password: string): Promise<any> {
@@ -64,17 +66,41 @@ export class AuthService {
     email: string;
     password: string;
     role?: string;
+    invite_code?: string;
   }) {
+    // Verificar si el registro público está habilitado
+    const allowPublicRegister = this.configService.get<string>('ALLOW_PUBLIC_REGISTER', 'true') === 'true';
+    if (!allowPublicRegister) {
+      throw new UnauthorizedException('El registro público está deshabilitado temporalmente');
+    }
+
     // Validación básica de DNI (8 dígitos)
     if (!/^\d{8}$/.test(registerDto.dni)) {
       throw new UnauthorizedException('DNI inválido. Debe tener 8 dígitos.');
+    }
+
+    // Determinar rol permitido (solo alumno o profesor)
+    const requestedRole =
+      registerDto.role === UserRole.PROFESOR ? UserRole.PROFESOR : UserRole.ALUMNO;
+
+    // Bloquear cualquier intento de crear super_admin por registro
+    if (registerDto.role === UserRole.SUPER_ADMIN) {
+      throw new UnauthorizedException('No autorizado');
+    }
+
+    // Si es profesor, validar invite_code (si está configurado en env)
+    if (requestedRole === UserRole.PROFESOR) {
+      const requiredCode = this.configService.get<string>('INVITE_CODE_PROFESOR');
+      if (requiredCode && registerDto.invite_code !== requiredCode) {
+        throw new BadRequestException('Código de invitación inválido');
+      }
     }
 
     const hashedPassword = await bcrypt.hash(registerDto.password, 10);
     const user = await this.usersService.create({
       ...registerDto,
       password: hashedPassword,
-      role: registerDto.role ? (registerDto.role as UserRole) : UserRole.ALUMNO,
+      role: requestedRole,
     });
 
     return this.login(user);

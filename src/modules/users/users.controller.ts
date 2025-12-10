@@ -8,9 +8,11 @@ import {
   Delete,
   UseGuards,
   Request,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { UsersService } from './users.service';
+import { UserRole } from './entities/user.entity';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 
@@ -18,8 +20,13 @@ import { UpdateUserDto } from './dto/update-user.dto';
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
+  @UseGuards(AuthGuard('jwt'))
   @Post()
-  create(@Body() createUserDto: CreateUserDto) {
+  create(@Request() req, @Body() createUserDto: CreateUserDto) {
+    // Solo super_admin puede crear usuarios y asignar roles (profesor, etc.)
+    if (req.user?.role !== UserRole.SUPER_ADMIN) {
+      throw new UnauthorizedException('Solo super_admin puede crear usuarios');
+    }
     return this.usersService.create(createUserDto);
   }
 
