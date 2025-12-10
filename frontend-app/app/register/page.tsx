@@ -2,16 +2,20 @@
 
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/lib/auth';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 
 export default function RegisterPage() {
+  const searchParams = useSearchParams();
+  const initialRole = searchParams.get('role') === 'profesor' ? 'profesor' : 'alumno';
   const [formData, setFormData] = useState({
     dni: '',
     full_name: '',
     email: '',
     password: '',
     confirmPassword: '',
+    role: initialRole,
+    invite_code: '',
   });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -20,7 +24,7 @@ export default function RegisterPage() {
 
   useEffect(() => {
     if (isAuthenticated && !authLoading) {
-      // Redirigir según el rol
+      // Redirigir según rol
       const role = user?.role;
       if (role === 'super_admin') {
         router.push('/admin/dashboard');
@@ -44,14 +48,7 @@ export default function RegisterPage() {
   }
 
   if (isAuthenticated) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-500 to-purple-600">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto"></div>
-          <p className="mt-4 text-white">Redirigiendo...</p>
-        </div>
-      </div>
-    );
+    return null;
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -76,6 +73,8 @@ export default function RegisterPage() {
         full_name: formData.full_name,
         email: formData.email,
         password: formData.password,
+        role: formData.role,
+        invite_code: formData.role === 'profesor' ? formData.invite_code || undefined : undefined,
       });
 
       if (success) {
@@ -101,7 +100,11 @@ export default function RegisterPage() {
           <h1 className="text-3xl font-bold text-gray-800 mb-2">
             🇵🇪 Crear Cuenta
           </h1>
-          <p className="text-gray-600">Regístrate en la plataforma</p>
+          <p className="text-gray-600">
+            {formData.role === 'profesor'
+              ? 'Regístrate como profesor'
+              : 'Regístrate como alumno'}
+          </p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -157,6 +160,39 @@ export default function RegisterPage() {
               placeholder="tu@email.com"
             />
           </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Rol
+            </label>
+            <input
+              type="text"
+              value={formData.role === 'profesor' ? 'Profesor' : 'Alumno'}
+              readOnly
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-100 text-gray-700"
+            />
+            <p className="text-xs text-gray-500 mt-1">
+              El rol se selecciona desde la landing (Alumno o Profesor).
+            </p>
+          </div>
+
+          {formData.role === 'profesor' && (
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Código de invitación (requerido para profesor)
+              </label>
+              <input
+                type="text"
+                value={formData.invite_code}
+                onChange={(e) =>
+                  setFormData({ ...formData, invite_code: e.target.value })
+                }
+                required
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                placeholder="Código de invitación"
+              />
+            </div>
+          )}
 
           <div>
             <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
