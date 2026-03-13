@@ -64,17 +64,27 @@ export class AuthService {
     email: string;
     password: string;
     role?: string;
+    invite_code?: string;
   }) {
     // Validación básica de DNI (8 dígitos)
     if (!/^\d{8}$/.test(registerDto.dni)) {
       throw new UnauthorizedException('DNI inválido. Debe tener 8 dígitos.');
     }
 
-    const hashedPassword = await bcrypt.hash(registerDto.password, 10);
+    // Validación de código de invitación para profesores
+    if (registerDto.role === 'profesor') {
+      const validInviteCode = process.env.INVITE_CODE_PROFESOR || 'devtools2026';
+      if (!registerDto.invite_code || registerDto.invite_code !== validInviteCode) {
+        throw new UnauthorizedException('Código de invitación inválido para registro de profesor.');
+      }
+    }
+
+    const { invite_code, ...userData } = registerDto;
+    const hashedPassword = await bcrypt.hash(userData.password, 10);
     const user = await this.usersService.create({
-      ...registerDto,
+      ...userData,
       password: hashedPassword,
-      role: registerDto.role ? (registerDto.role as UserRole) : UserRole.ALUMNO,
+      role: userData.role ? (userData.role as UserRole) : UserRole.ALUMNO,
     });
 
     return this.login(user);

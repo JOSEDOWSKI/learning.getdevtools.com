@@ -22,6 +22,10 @@ export class RegisterDto {
 
   @IsOptional()
   @IsString()
+  invite_code?: string;
+
+  @IsOptional()
+  @IsString()
   linkedin_url?: string;
 
   @IsOptional()
