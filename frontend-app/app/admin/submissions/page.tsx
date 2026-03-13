@@ -66,10 +66,10 @@ export default function AdminSubmissionsPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center bg-[var(--cream)]">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Cargando...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[var(--text-primary)] mx-auto"></div>
+          <p className="mt-4 text-[var(--text-secondary)]">Cargando...</p>
         </div>
       </div>
     );
@@ -83,24 +83,24 @@ export default function AdminSubmissionsPage() {
     <Layout>
       <div className="px-4 sm:px-0">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">Todas las Entregas</h1>
-          <p className="mt-2 text-gray-600">
+          <h1 className="text-3xl font-bold text-[var(--text-primary)] font-serif">Todas las Entregas</h1>
+          <p className="mt-2 text-[var(--text-secondary)]">
             Revisa todas las entregas de estudiantes en la plataforma
           </p>
         </div>
 
         {loadingSubmissions ? (
           <div className="text-center py-12">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-            <p className="mt-4 text-gray-600">Cargando entregas...</p>
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[var(--text-primary)] mx-auto"></div>
+            <p className="mt-4 text-[var(--text-secondary)]">Cargando entregas...</p>
           </div>
         ) : submissions.length === 0 ? (
-          <div className="bg-white rounded-lg shadow p-8 text-center">
-            <p className="text-gray-600">No hay entregas aún.</p>
+          <div className="bg-[var(--cream-light)] rounded-lg border border-[var(--warm-border)] p-8 text-center">
+            <p className="text-[var(--text-secondary)]">No hay entregas aún.</p>
           </div>
         ) : (
-          <div className="bg-white shadow overflow-hidden sm:rounded-md">
-            <ul className="divide-y divide-gray-200">
+          <div className="bg-[var(--cream-light)] border border-[var(--warm-border)] overflow-hidden sm:rounded-md">
+            <ul className="divide-y divide-[var(--warm-border)]">
               {submissions.map((submission) => (
                 <li key={submission.id}>
                   <div className="px-4 py-4 sm:px-6">
@@ -108,25 +108,25 @@ export default function AdminSubmissionsPage() {
                       <div className="flex-1">
                         <div className="flex items-center">
                           <div className="flex-shrink-0">
-                            <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center">
-                              <span className="text-blue-600 font-semibold">
+                            <div className="h-10 w-10 rounded-full bg-[var(--accent)]/20 flex items-center justify-center">
+                              <span className="text-[var(--accent)] font-semibold">
                                 {submission.student.full_name.charAt(0).toUpperCase()}
                               </span>
                             </div>
                           </div>
                           <div className="ml-4">
                             <div className="flex items-center">
-                              <p className="text-sm font-medium text-gray-900">
+                              <p className="text-sm font-medium text-[var(--text-primary)]">
                                 {submission.student.full_name}
                               </p>
-                              <span className="ml-2 text-xs text-gray-500">
+                              <span className="ml-2 text-xs text-[var(--text-muted)]">
                                 ({submission.student.email})
                               </span>
                             </div>
-                            <p className="text-sm text-gray-600 mt-1">
+                            <p className="text-sm text-[var(--text-secondary)] mt-1">
                               Curso: <span className="font-medium">{submission.course.title}</span>
                             </p>
-                            <p className="text-xs text-gray-400 mt-1">
+                            <p className="text-xs text-[var(--text-muted)] mt-1">
                               Entregado: {new Date(submission.created_at).toLocaleString()}
                             </p>
                           </div>
@@ -136,29 +136,29 @@ export default function AdminSubmissionsPage() {
                             href={submission.project_url}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="text-blue-600 hover:text-blue-700 text-sm font-medium"
+                            className="text-[var(--accent)] hover:text-[var(--accent)]/80 text-sm font-medium"
                           >
-                            🔗 Ver Proyecto: {submission.project_url}
+                            Ver Proyecto: {submission.project_url}
                           </a>
                         </div>
                         {submission.evaluation && (
-                          <div className="mt-4 bg-gray-50 rounded-lg p-4">
+                          <div className="mt-4 bg-[var(--cream)] rounded-lg p-4 border border-[var(--warm-border)]">
                             <div className="flex items-center justify-between mb-2">
-                              <span className="text-sm font-medium text-gray-700">
+                              <span className="text-sm font-medium text-[var(--text-primary)]">
                                 Evaluación ({submission.evaluation.provider})
                               </span>
-                              <span className="text-lg font-bold text-blue-600">
+                              <span className="text-lg font-bold text-[var(--accent)]">
                                 {submission.evaluation.score.toFixed(1)}/20
                               </span>
                             </div>
-                            <p className="text-sm text-gray-600">
+                            <p className="text-sm text-[var(--text-secondary)]">
                               {submission.evaluation.feedback_summary}
                             </p>
                           </div>
                         )}
                         {!submission.evaluation && (
-                          <div className="mt-4 bg-yellow-50 rounded-lg p-4">
-                            <p className="text-sm text-yellow-800">
+                          <div className="mt-4 bg-[var(--warning-bg)] rounded-lg p-4">
+                            <p className="text-sm text-[var(--warning)]">
                               ⏳ Evaluación pendiente
                             </p>
                           </div>
@@ -167,7 +167,7 @@ export default function AdminSubmissionsPage() {
                       <div className="ml-4">
                         <Link
                           href={`/submissions/${submission.id}`}
-                          className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors"
+                          className="bg-[var(--btn-primary)] text-white px-4 py-2 rounded-lg text-sm font-medium hover:opacity-90 transition-opacity"
                         >
                           Ver Detalles
                         </Link>

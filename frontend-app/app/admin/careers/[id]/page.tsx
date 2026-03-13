@@ -152,10 +152,10 @@ export default function CareerPlanPage() {
 
   if (loading || loadingData) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center bg-[var(--cream)]">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Cargando...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[var(--text-primary)] mx-auto"></div>
+          <p className="mt-4 text-[var(--text-secondary)]">Cargando...</p>
         </div>
       </div>
     );
@@ -171,24 +171,24 @@ export default function CareerPlanPage() {
         <div className="mb-8">
           <button
             onClick={() => router.push('/admin/careers')}
-            className="text-blue-600 hover:text-blue-700 mb-4"
+            className="text-[var(--accent)] hover:text-[var(--accent)]/80 mb-4"
           >
             ← Volver a Carreras
           </button>
-          <h1 className="text-3xl font-bold text-gray-900">
+          <h1 className="text-3xl font-bold text-[var(--text-primary)] font-serif">
             Plan de Estudios: {career.name}
           </h1>
-          <p className="mt-2 text-gray-600">{career.description}</p>
+          <p className="mt-2 text-[var(--text-secondary)]">{career.description}</p>
           <div className="mt-4 flex items-center space-x-4">
-            <span className="text-sm text-gray-500">
-              📅 {career.total_months} meses
+            <span className="text-sm text-[var(--text-muted)]">
+              {career.total_months} meses
             </span>
-            <span className="text-sm text-gray-500">
-              📚 {sortedCurriculum.length} cursos
+            <span className="text-sm text-[var(--text-muted)]">
+              {sortedCurriculum.length} cursos
             </span>
             {sortedCurriculum.length < 24 && (
-              <span className="text-sm text-yellow-600">
-                ⚠️ Mínimo 24 cursos para completar la carrera
+              <span className="text-sm text-[var(--warning)]">
+                Mínimo 24 cursos para completar la carrera
               </span>
             )}
           </div>
@@ -197,7 +197,7 @@ export default function CareerPlanPage() {
         <div className="mb-6">
           <button
             onClick={() => setShowAddModal(true)}
-            className="bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors"
+            className="bg-[var(--btn-primary)] text-white px-6 py-3 rounded-lg font-semibold hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
             disabled={availableCourses.length === 0}
           >
             + Agregar Curso a la Carrera
@@ -205,50 +205,50 @@ export default function CareerPlanPage() {
         </div>
 
         {sortedCurriculum.length === 0 ? (
-          <div className="bg-white rounded-lg shadow p-8 text-center">
-            <p className="text-gray-600 mb-4">
+          <div className="bg-[var(--cream-light)] rounded-lg border border-[var(--warm-border)] p-8 text-center">
+            <p className="text-[var(--text-secondary)] mb-4">
               Esta carrera aún no tiene cursos asignados.
             </p>
-            <p className="text-sm text-gray-500 mb-4">
+            <p className="text-sm text-[var(--text-muted)] mb-4">
               Agrega al menos 24 cursos para completar el plan de estudios.
             </p>
             <button
               onClick={() => setShowAddModal(true)}
-              className="bg-blue-600 text-white px-6 py-2 rounded-lg font-semibold hover:bg-blue-700 transition-colors"
+              className="bg-[var(--btn-primary)] text-white px-6 py-2 rounded-lg font-semibold hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
               disabled={availableCourses.length === 0}
             >
               Agregar Primer Curso
             </button>
           </div>
         ) : (
-          <div className="bg-white rounded-lg shadow overflow-hidden">
-            <div className="px-6 py-4 bg-gray-50 border-b">
-              <h2 className="text-lg font-semibold text-gray-900">
+          <div className="bg-[var(--cream-light)] rounded-lg border border-[var(--warm-border)] overflow-hidden">
+            <div className="px-6 py-4 bg-[var(--cream)] border-b border-[var(--warm-border)]">
+              <h2 className="text-lg font-semibold text-[var(--text-primary)] font-serif">
                 Cursos en el Plan de Estudios ({sortedCurriculum.length}/24 mínimo)
               </h2>
             </div>
-            <ul className="divide-y divide-gray-200">
+            <ul className="divide-y divide-[var(--warm-border)]">
               {sortedCurriculum.map((item, index) => (
                 <li key={item.id} className="px-6 py-4">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-4">
-                      <div className="flex-shrink-0 w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-                        <span className="text-blue-600 font-semibold">
+                      <div className="flex-shrink-0 w-10 h-10 bg-[var(--accent)]/20 rounded-full flex items-center justify-center">
+                        <span className="text-[var(--accent)] font-semibold">
                           {item.order_index}
                         </span>
                       </div>
                       <div>
-                        <p className="text-sm font-medium text-gray-900">
+                        <p className="text-sm font-medium text-[var(--text-primary)]">
                           {item.course.title}
                         </p>
-                        <p className="text-sm text-gray-500">
+                        <p className="text-sm text-[var(--text-secondary)]">
                           {item.course.credits} créditos
                         </p>
                       </div>
                     </div>
                     <button
                       onClick={() => handleRemoveCourse(item.course_id)}
-                      className="bg-red-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-red-700 transition-colors"
+                      className="bg-[var(--error)] text-white px-4 py-2 rounded-lg text-sm font-medium hover:opacity-90 transition-opacity"
                     >
                       Quitar
                     </button>
@@ -262,14 +262,14 @@ export default function CareerPlanPage() {
         {/* Modal para agregar curso */}
         {showAddModal && (
           <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
-            <div className="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+            <div className="relative top-20 mx-auto p-5 border border-[var(--warm-border)] w-96 shadow-lg rounded-md bg-[var(--cream-light)]">
               <div className="mt-3">
-                <h3 className="text-lg font-medium text-gray-900 mb-4">
+                <h3 className="text-lg font-medium text-[var(--text-primary)] mb-4 font-serif">
                   Agregar Curso a la Carrera
                 </h3>
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm font-medium text-[var(--text-primary)] mb-2">
                       Seleccionar Curso
                     </label>
                     <select
@@ -279,7 +279,7 @@ export default function CareerPlanPage() {
                           e.target.value ? parseInt(e.target.value, 10) : null
                         )
                       }
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full px-4 py-2 border border-[var(--warm-border)] rounded-lg focus:ring-2 focus:ring-[var(--accent)] focus:border-transparent bg-[var(--cream)]"
                     >
                       <option value="">Selecciona un curso...</option>
                       {availableCourses.map((course) => (
@@ -290,11 +290,11 @@ export default function CareerPlanPage() {
                       ))}
                     </select>
                     {availableCourses.length === 0 && (
-                      <p className="mt-2 text-sm text-gray-500">
+                      <p className="mt-2 text-sm text-[var(--text-muted)]">
                         No hay cursos disponibles. Crea cursos primero desde{' '}
                         <Link
                           href="/professor/courses"
-                          className="text-blue-600 hover:text-blue-700"
+                          className="text-[var(--accent)] hover:text-[var(--accent)]/80"
                         >
                           aquí
                         </Link>
@@ -303,7 +303,7 @@ export default function CareerPlanPage() {
                     )}
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm font-medium text-[var(--text-primary)] mb-2">
                       Orden en el Plan (Mes/Posición)
                     </label>
                     <input
@@ -312,10 +312,10 @@ export default function CareerPlanPage() {
                       onChange={(e) =>
                         setOrderIndex(parseInt(e.target.value) || 1)
                       }
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full px-4 py-2 border border-[var(--warm-border)] rounded-lg focus:ring-2 focus:ring-[var(--accent)] focus:border-transparent bg-[var(--cream)]"
                       min="1"
                     />
-                    <p className="mt-2 text-xs text-gray-500">
+                    <p className="mt-2 text-xs text-[var(--text-muted)]">
                       Este número indica el orden del curso en la carrera (ej: 1
                       = primer mes, 2 = segundo mes, etc.)
                     </p>
@@ -325,7 +325,7 @@ export default function CareerPlanPage() {
                   <button
                     onClick={handleAddCourse}
                     disabled={!selectedCourseId}
-                    className="flex-1 bg-blue-600 text-white py-2 rounded-lg font-medium hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="flex-1 bg-[var(--btn-primary)] text-white py-2 rounded-lg font-medium hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     Agregar
                   </button>
@@ -334,7 +334,7 @@ export default function CareerPlanPage() {
                       setShowAddModal(false);
                       setSelectedCourseId(null);
                     }}
-                    className="flex-1 bg-gray-300 text-gray-700 py-2 rounded-lg font-medium hover:bg-gray-400 transition-colors"
+                    className="flex-1 bg-[var(--warm-border)] text-[var(--text-primary)] py-2 rounded-lg font-medium hover:opacity-70 transition-opacity"
                   >
                     Cancelar
                   </button>

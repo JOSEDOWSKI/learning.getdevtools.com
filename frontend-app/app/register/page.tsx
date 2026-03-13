@@ -24,7 +24,6 @@ function RegisterForm() {
 
   useEffect(() => {
     if (isAuthenticated && !authLoading) {
-      // Redirigir según rol
       const role = user?.role;
       if (role === 'super_admin') {
         router.push('/admin/dashboard');
@@ -38,30 +37,28 @@ function RegisterForm() {
 
   if (authLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-500 to-purple-600">
+      <div className="min-h-screen flex items-center justify-center" style={{ background: 'var(--cream)' }}>
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto"></div>
-          <p className="mt-4 text-white">Cargando...</p>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 mx-auto" style={{ borderColor: 'var(--text-primary)' }}></div>
+          <p className="mt-4 text-sm" style={{ color: 'var(--text-secondary)' }}>Cargando...</p>
         </div>
       </div>
     );
   }
 
-  if (isAuthenticated) {
-    return null;
-  }
+  if (isAuthenticated) return null;
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError('');
 
     if (formData.password !== formData.confirmPassword) {
-      setError('Las contraseñas no coinciden');
+      setError('Las contrasenas no coinciden');
       return;
     }
 
     if (formData.dni.length !== 8 || !/^\d{8}$/.test(formData.dni)) {
-      setError('El DNI debe tener 8 dígitos');
+      setError('El DNI debe tener 8 digitos');
       return;
     }
 
@@ -78,7 +75,6 @@ function RegisterForm() {
       });
 
       if (success) {
-        // Esperar un momento para que el estado se actualice
         await new Promise(resolve => setTimeout(resolve, 200));
         router.push('/dashboard');
         router.refresh();
@@ -93,134 +89,159 @@ function RegisterForm() {
     }
   }
 
+  const inputStyle = { border: '1px solid var(--warm-border)', background: '#ffffff', color: 'var(--text-primary)' };
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-500 to-purple-600 px-4 py-8">
-      <div className="max-w-md w-full bg-white rounded-2xl shadow-xl p-8">
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-800 mb-2">
-            🇵🇪 Crear Cuenta
-          </h1>
-          <p className="text-gray-600">
-            {formData.role === 'profesor'
-              ? 'Regístrate como profesor'
-              : 'Regístrate como alumno'}
-          </p>
+    <div className="min-h-screen" style={{ background: 'var(--cream)' }}>
+      <div className="nav-gold-bar" />
+
+      <nav style={{ background: '#ffffff', borderBottom: '1px solid var(--warm-border)' }}>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between h-16 items-center">
+            <Link
+              href="/"
+              className="text-lg tracking-tight"
+              style={{ fontFamily: "'Source Serif 4', Georgia, serif", fontWeight: 600, color: 'var(--text-primary)' }}
+            >
+              DEVTOOLS
+            </Link>
+            <Link href="/courses" className="text-sm" style={{ color: 'var(--text-secondary)' }}>
+              Cursos
+            </Link>
+          </div>
         </div>
+      </nav>
+
+      <div className="max-w-md mx-auto px-4 pt-12 pb-16">
+        <div className="flex items-center justify-center space-x-6 mb-10">
+          <Link
+            href="/login"
+            className="text-lg pb-2"
+            style={{
+              fontFamily: "'Source Serif 4', Georgia, serif",
+              fontWeight: 400,
+              color: 'var(--text-muted)',
+              borderBottom: '2px solid transparent',
+            }}
+          >
+            Iniciar Sesion
+          </Link>
+          <span
+            className="text-lg pb-2"
+            style={{
+              fontFamily: "'Source Serif 4', Georgia, serif",
+              fontWeight: 600,
+              color: 'var(--text-primary)',
+              borderBottom: '2px solid var(--text-primary)',
+            }}
+          >
+            Registrarse
+          </span>
+        </div>
+
+        <p className="text-sm mb-8 text-center" style={{ color: 'var(--text-secondary)' }}>
+          {formData.role === 'profesor'
+            ? 'Registrate como profesor en DevTools Learning.'
+            : 'Crea tu cuenta de alumno en DevTools Learning.'}
+        </p>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           {error && (
-            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
+            <div className="px-4 py-3 rounded text-sm" style={{ background: 'var(--error-bg)', color: 'var(--error)', border: '1px solid #fecaca' }}>
               {error}
             </div>
           )}
 
           <div>
-            <label htmlFor="dni" className="block text-sm font-medium text-gray-700 mb-2">
-              DNI (8 dígitos)
-            </label>
+            <label className="block text-sm mb-2" style={{ color: 'var(--text-secondary)' }}>DNI (8 digitos)</label>
             <input
-              id="dni"
               type="text"
               value={formData.dni}
               onChange={(e) => setFormData({ ...formData, dni: e.target.value })}
               required
               maxLength={8}
               pattern="[0-9]{8}"
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-4 py-3 text-sm rounded"
+              style={inputStyle}
               placeholder="12345678"
             />
           </div>
 
           <div>
-            <label htmlFor="full_name" className="block text-sm font-medium text-gray-700 mb-2">
-              Nombre Completo
-            </label>
+            <label className="block text-sm mb-2" style={{ color: 'var(--text-secondary)' }}>Nombre Completo</label>
             <input
-              id="full_name"
               type="text"
               value={formData.full_name}
               onChange={(e) => setFormData({ ...formData, full_name: e.target.value })}
               required
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              placeholder="Juan Pérez"
+              className="w-full px-4 py-3 text-sm rounded"
+              style={inputStyle}
+              placeholder="Juan Perez"
             />
           </div>
 
           <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
-              Email
-            </label>
+            <label className="block text-sm mb-2" style={{ color: 'var(--text-secondary)' }}>Email</label>
             <input
-              id="email"
               type="email"
               value={formData.email}
               onChange={(e) => setFormData({ ...formData, email: e.target.value })}
               required
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-4 py-3 text-sm rounded"
+              style={inputStyle}
               placeholder="tu@email.com"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Rol
-            </label>
+            <label className="block text-sm mb-2" style={{ color: 'var(--text-secondary)' }}>Rol</label>
             <input
               type="text"
               value={formData.role === 'profesor' ? 'Profesor' : 'Alumno'}
               readOnly
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-100 text-gray-700"
+              className="w-full px-4 py-3 text-sm rounded"
+              style={{ ...inputStyle, background: 'var(--cream-light)', color: 'var(--text-secondary)' }}
             />
-            <p className="text-xs text-gray-500 mt-1">
-              El rol se selecciona desde la landing (Alumno o Profesor).
-            </p>
           </div>
 
           {formData.role === 'profesor' && (
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Código de invitación (requerido para profesor)
-              </label>
+              <label className="block text-sm mb-2" style={{ color: 'var(--text-secondary)' }}>Codigo de invitacion</label>
               <input
                 type="text"
                 value={formData.invite_code}
-                onChange={(e) =>
-                  setFormData({ ...formData, invite_code: e.target.value })
-                }
+                onChange={(e) => setFormData({ ...formData, invite_code: e.target.value })}
                 required
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                placeholder="Código de invitación"
+                className="w-full px-4 py-3 text-sm rounded"
+                style={inputStyle}
+                placeholder="Codigo de invitacion"
               />
             </div>
           )}
 
           <div>
-            <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
-              Contraseña
-            </label>
+            <label className="block text-sm mb-2" style={{ color: 'var(--text-secondary)' }}>Contrasena</label>
             <input
-              id="password"
               type="password"
               value={formData.password}
               onChange={(e) => setFormData({ ...formData, password: e.target.value })}
               required
               minLength={6}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-4 py-3 text-sm rounded"
+              style={inputStyle}
               placeholder="••••••••"
             />
           </div>
 
           <div>
-            <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-2">
-              Confirmar Contraseña
-            </label>
+            <label className="block text-sm mb-2" style={{ color: 'var(--text-secondary)' }}>Confirmar Contrasena</label>
             <input
-              id="confirmPassword"
               type="password"
               value={formData.confirmPassword}
               onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
               required
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-4 py-3 text-sm rounded"
+              style={inputStyle}
               placeholder="••••••••"
             />
           </div>
@@ -228,17 +249,18 @@ function RegisterForm() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full py-3 text-sm font-medium rounded disabled:opacity-50 disabled:cursor-not-allowed"
+            style={{ background: 'var(--btn-primary)', color: '#ffffff' }}
           >
             {loading ? 'Registrando...' : 'Registrarse'}
           </button>
         </form>
 
-        <div className="mt-6 text-center">
-          <p className="text-gray-600">
-            ¿Ya tienes cuenta?{' '}
-            <Link href="/login" className="text-blue-600 hover:text-blue-700 font-semibold">
-              Inicia sesión
+        <div className="mt-8 pt-8 text-center" style={{ borderTop: '1px solid var(--warm-border)' }}>
+          <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
+            Ya tienes cuenta?{' '}
+            <Link href="/login" style={{ color: 'var(--accent)', fontWeight: 500 }}>
+              Inicia sesion
             </Link>
           </p>
         </div>
@@ -250,10 +272,10 @@ function RegisterForm() {
 export default function RegisterPage() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-500 to-purple-600">
+      <div className="min-h-screen flex items-center justify-center" style={{ background: 'var(--cream)' }}>
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto"></div>
-          <p className="mt-4 text-white">Cargando...</p>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 mx-auto" style={{ borderColor: 'var(--text-primary)' }}></div>
+          <p className="mt-4 text-sm" style={{ color: 'var(--text-secondary)' }}>Cargando...</p>
         </div>
       </div>
     }>
@@ -261,4 +283,3 @@ export default function RegisterPage() {
     </Suspense>
   );
 }
-

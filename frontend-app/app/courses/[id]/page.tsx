@@ -131,8 +131,8 @@ export default function CourseDetailPage() {
 
   if (loading || !isAuthenticated) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: 'var(--cream)' }}>
+        <div className="animate-spin rounded-full h-12 w-12" style={{ borderColor: 'var(--text-primary)', borderTopColor: 'transparent', borderWidth: '3px' }}></div>
       </div>
     );
   }
@@ -140,9 +140,9 @@ export default function CourseDetailPage() {
   if (loadingCourse) {
     return (
       <Layout>
-        <div className="text-center py-12">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Cargando curso...</p>
+        <div className="text-center py-12" style={{ backgroundColor: 'var(--cream)' }}>
+          <div className="animate-spin rounded-full h-12 w-12 mx-auto" style={{ borderColor: 'var(--text-primary)', borderTopColor: 'transparent', borderWidth: '3px' }}></div>
+          <p className="mt-4" style={{ color: 'var(--text-secondary)' }}>Cargando curso...</p>
         </div>
       </Layout>
     );
@@ -151,8 +151,8 @@ export default function CourseDetailPage() {
   if (!course) {
     return (
       <Layout>
-        <div className="bg-white rounded-lg shadow p-8 text-center">
-          <p className="text-gray-600">Curso no encontrado.</p>
+        <div className="rounded-lg p-8 text-center" style={{ backgroundColor: 'var(--cream-light)', border: '1px solid var(--warm-border)' }}>
+          <p style={{ color: 'var(--text-secondary)' }}>Curso no encontrado.</p>
         </div>
       </Layout>
     );
@@ -160,38 +160,39 @@ export default function CourseDetailPage() {
 
   return (
     <Layout>
-      <div className="px-4 sm:px-0">
+      <div className="px-4 sm:px-0" style={{ backgroundColor: 'var(--cream)' }}>
         <div className="mb-6">
           <button
             onClick={() => router.back()}
-            className="text-blue-600 hover:text-blue-700 mb-4"
+            className="mb-4 transition-colors"
+            style={{ color: 'var(--accent)' }}
           >
             ← Volver
           </button>
-          <h1 className="text-3xl font-bold text-gray-900">{course.title}</h1>
+          <h1 className="text-3xl font-bold" style={{ color: 'var(--text-primary)', fontFamily: "'Source Serif 4', Georgia, serif" }}>{course.title}</h1>
           {course.professor && (
-            <p className="mt-2 text-gray-600">Profesor: {course.professor.full_name}</p>
+            <p className="mt-2" style={{ color: 'var(--text-secondary)' }}>Profesor: {course.professor.full_name}</p>
           )}
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2">
-            <div className="bg-white rounded-lg shadow p-6 mb-6">
-              <h2 className="text-xl font-semibold text-gray-900 mb-4">
+            <div className="rounded-lg p-6 mb-6" style={{ backgroundColor: 'var(--cream-light)', border: '2px solid var(--warm-border)' }}>
+              <h2 className="text-xl font-semibold mb-4" style={{ color: 'var(--text-primary)', fontFamily: "'Source Serif 4', Georgia, serif" }}>
                 Descripción
               </h2>
-              <p className="text-gray-700">
+              <p style={{ color: 'var(--text-secondary)' }}>
                 {course.description || 'No hay descripción disponible.'}
               </p>
             </div>
 
             {course.rubric && (
-              <div className="bg-white rounded-lg shadow p-6 mb-6">
-                <h2 className="text-xl font-semibold text-gray-900 mb-4">
+              <div className="rounded-lg p-6 mb-6" style={{ backgroundColor: 'var(--cream-light)', border: '2px solid var(--warm-border)' }}>
+                <h2 className="text-xl font-semibold mb-4" style={{ color: 'var(--text-primary)', fontFamily: "'Source Serif 4', Georgia, serif" }}>
                   Rúbrica de Evaluación
                 </h2>
                 <div className="prose max-w-none">
-                  <pre className="whitespace-pre-wrap text-sm bg-gray-50 p-4 rounded">
+                  <pre className="whitespace-pre-wrap text-sm p-4 rounded" style={{ backgroundColor: 'var(--cream)', border: '1px solid var(--warm-border)', color: 'var(--text-secondary)' }}>
                     {course.rubric}
                   </pre>
                 </div>
@@ -199,17 +200,17 @@ export default function CourseDetailPage() {
             )}
 
             {hasAccess && (
-              <div className="bg-white rounded-lg shadow p-6 mb-6">
-                <h2 className="text-xl font-semibold text-gray-900 mb-4">
+              <div className="rounded-lg p-6 mb-6" style={{ backgroundColor: 'var(--cream-light)', border: '2px solid var(--warm-border)' }}>
+                <h2 className="text-xl font-semibold mb-4" style={{ color: 'var(--text-primary)', fontFamily: "'Source Serif 4', Georgia, serif" }}>
                   Lecciones del Curso
                 </h2>
                 {loadingLessons ? (
                   <div className="text-center py-8">
-                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
-                    <p className="mt-2 text-gray-600">Cargando lecciones...</p>
+                    <div className="animate-spin rounded-full h-8 w-8 mx-auto" style={{ borderColor: 'var(--text-primary)', borderTopColor: 'transparent', borderWidth: '2px' }}></div>
+                    <p className="mt-2" style={{ color: 'var(--text-secondary)' }}>Cargando lecciones...</p>
                   </div>
                 ) : lessons.length === 0 ? (
-                  <p className="text-gray-600 text-center py-8">
+                  <p className="text-center py-8" style={{ color: 'var(--text-secondary)' }}>
                     No hay lecciones disponibles aún.
                   </p>
                 ) : (
@@ -226,32 +227,33 @@ export default function CourseDetailPage() {
                         return (
                           <div
                             key={lesson.id}
-                            className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow"
+                            className="rounded-lg p-4 hover:shadow-md transition-shadow"
+                            style={{ border: '1px solid var(--warm-border)', backgroundColor: 'var(--cream)' }}
                           >
                             <div className="flex items-center justify-between">
                               <div className="flex-1">
                                 <div className="flex items-center gap-3 mb-2">
-                                  <span className="text-sm font-medium text-gray-500 bg-gray-100 px-2 py-1 rounded">
+                                  <span className="text-sm font-medium px-2 py-1 rounded" style={{ color: 'var(--text-muted)', backgroundColor: 'var(--cream-light)', border: '1px solid var(--warm-border)' }}>
                                     #{lesson.order_index + 1}
                                   </span>
-                                  <h3 className="text-lg font-semibold text-gray-900">
+                                  <h3 className="text-lg font-semibold" style={{ color: 'var(--text-primary)', fontFamily: "'Source Serif 4', Georgia, serif" }}>
                                     {lesson.title}
                                   </h3>
                                   {isCompleted && (
-                                    <span className="text-xs text-green-600 font-medium bg-green-100 px-2 py-1 rounded">
-                                      ✓ Completada
+                                    <span className="text-xs font-medium px-2 py-1 rounded" style={{ color: 'var(--success)', backgroundColor: 'rgba(5, 150, 105, 0.1)', border: '1px solid var(--success)' }}>
+                                      Completada
                                     </span>
                                   )}
                                 </div>
                                 {progressPercent > 0 && (
                                   <div className="mt-2">
-                                    <div className="w-full bg-gray-200 rounded-full h-1.5">
+                                    <div className="w-full rounded-full h-1.5" style={{ backgroundColor: 'var(--cream-light)', border: '1px solid var(--warm-border)' }}>
                                       <div
-                                        className="bg-blue-600 h-1.5 rounded-full transition-all"
-                                        style={{ width: `${progressPercent}%` }}
+                                        className="h-1.5 rounded-full transition-all"
+                                        style={{ backgroundColor: 'var(--text-primary)', width: `${progressPercent}%` }}
                                       ></div>
                                     </div>
-                                    <p className="text-xs text-gray-500 mt-1">
+                                    <p className="text-xs mt-1" style={{ color: 'var(--text-muted)' }}>
                                       {Math.round(progressPercent)}% completado
                                     </p>
                                   </div>
@@ -261,7 +263,8 @@ export default function CourseDetailPage() {
                                 onClick={() =>
                                   router.push(`/courses/${courseId}/lessons/${lesson.id}`)
                                 }
-                                className="ml-4 bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors"
+                                className="ml-4 text-white px-4 py-2 rounded text-sm font-medium transition-colors hover:opacity-90"
+                                style={{ backgroundColor: 'var(--btn-primary)' }}
                               >
                                 {progressPercent > 0 ? 'Continuar' : 'Comenzar'}
                               </button>
@@ -275,13 +278,13 @@ export default function CourseDetailPage() {
             )}
 
             {hasAccess && (
-              <div className="bg-white rounded-lg shadow p-6">
-                <h2 className="text-xl font-semibold text-gray-900 mb-4">
+              <div className="rounded-lg p-6" style={{ backgroundColor: 'var(--cream-light)', border: '2px solid var(--warm-border)' }}>
+                <h2 className="text-xl font-semibold mb-4" style={{ color: 'var(--text-primary)', fontFamily: "'Source Serif 4', Georgia, serif" }}>
                   Enviar Entrega
                 </h2>
                 <form onSubmit={handleSubmit} className="space-y-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-primary)' }}>
                       URL del Proyecto
                     </label>
                     <input
@@ -290,16 +293,18 @@ export default function CourseDetailPage() {
                       onChange={(e) => setSubmissionUrl(e.target.value)}
                       placeholder="https://github.com/usuario/proyecto"
                       required
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full px-4 py-3 rounded-lg focus:outline-none focus:ring-2 transition-colors"
+                      style={{ border: '1px solid var(--warm-border)', backgroundColor: 'var(--cream)', color: 'var(--text-primary)' }}
                     />
-                    <p className="mt-2 text-sm text-gray-500">
+                    <p className="mt-2 text-sm" style={{ color: 'var(--text-muted)' }}>
                       Ingresa la URL de tu repositorio o proyecto
                     </p>
                   </div>
                   <button
                     type="submit"
                     disabled={submitting}
-                    className="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors disabled:opacity-50"
+                    className="w-full text-white py-3 rounded font-semibold transition-colors hover:opacity-90 disabled:opacity-50"
+                    style={{ backgroundColor: 'var(--btn-primary)' }}
                   >
                     {submitting ? 'Enviando...' : 'Enviar Entrega'}
                   </button>
@@ -308,52 +313,52 @@ export default function CourseDetailPage() {
             )}
 
             {!hasAccess && (
-              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-6">
-                <p className="text-yellow-800">
-                  ⚠️ No tienes acceso a este curso. Contacta al administrador para obtener acceso.
+              <div className="rounded-lg p-6" style={{ backgroundColor: 'rgba(180, 83, 9, 0.1)', border: '2px solid var(--warning)' }}>
+                <p style={{ color: 'var(--warning)' }}>
+                  No tienes acceso a este curso. Contacta al administrador para obtener acceso.
                 </p>
               </div>
             )}
           </div>
 
           <div>
-            <div className="bg-white rounded-lg shadow p-6 sticky top-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">
+            <div className="rounded-lg p-6 sticky top-6" style={{ backgroundColor: 'var(--cream-light)', border: '2px solid var(--warm-border)' }}>
+              <h3 className="text-lg font-semibold mb-4" style={{ color: 'var(--text-primary)', fontFamily: "'Source Serif 4', Georgia, serif" }}>
                 Información del Curso
               </h3>
               <div className="space-y-4">
                 <div>
-                  <span className="text-sm text-gray-500">Créditos</span>
-                  <p className="text-lg font-semibold text-gray-900">
+                  <span className="text-sm" style={{ color: 'var(--text-muted)' }}>Créditos</span>
+                  <p className="text-lg font-semibold" style={{ color: 'var(--text-primary)' }}>
                     {course.credits}
                   </p>
                 </div>
                 <div>
-                  <span className="text-sm text-gray-500">Precio</span>
-                  <p className="text-lg font-semibold text-blue-600">
+                  <span className="text-sm" style={{ color: 'var(--text-muted)' }}>Precio</span>
+                  <p className="text-lg font-semibold" style={{ color: 'var(--accent)' }}>
                     S/ {course.base_price}
                   </p>
                 </div>
                 {hasAccess && (
-                  <div className="pt-4 border-t space-y-3">
-                    <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">
-                      ✓ Tienes acceso
+                  <div className="pt-4 space-y-3" style={{ borderTop: '1px solid var(--warm-border)' }}>
+                    <span className="inline-flex items-center px-3 py-1 rounded text-sm font-medium" style={{ color: 'var(--success)', backgroundColor: 'rgba(5, 150, 105, 0.1)', border: '1px solid var(--success)' }}>
+                      Tienes acceso
                     </span>
                     {courseProgress && (
                       <div>
                         <div className="flex justify-between text-sm mb-1">
-                          <span className="text-gray-600">Progreso del Curso</span>
-                          <span className="font-medium">
+                          <span style={{ color: 'var(--text-secondary)' }}>Progreso del Curso</span>
+                          <span className="font-medium" style={{ color: 'var(--text-primary)' }}>
                             {courseProgress.completedLessons} / {courseProgress.totalLessons} lecciones
                           </span>
                         </div>
-                        <div className="w-full bg-gray-200 rounded-full h-2">
+                        <div className="w-full rounded-full h-2" style={{ backgroundColor: 'var(--cream)', border: '1px solid var(--warm-border)' }}>
                           <div
-                            className="bg-green-600 h-2 rounded-full transition-all"
-                            style={{ width: `${courseProgress.overallProgress}%` }}
+                            className="h-2 rounded-full transition-all"
+                            style={{ backgroundColor: 'var(--success)', width: `${courseProgress.overallProgress}%` }}
                           ></div>
                         </div>
-                        <p className="text-xs text-gray-500 mt-1">
+                        <p className="text-xs mt-1" style={{ color: 'var(--text-muted)' }}>
                           {Math.round(courseProgress.overallProgress)}% completado
                         </p>
                       </div>

@@ -1,8 +1,27 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #faf6f1;
+  --foreground: #1a1a1a;
+  --cream: #faf6f1;
+  --cream-light: #fdf9f4;
+  --cream-dark: #f0e9df;
+  --warm-border: #e8e0d8;
+  --warm-border-light: #f0ebe4;
+  --text-primary: #1a1a1a;
+  --text-secondary: #6b6b6b;
+  --text-muted: #9a9a9a;
+  --accent: #0ea5e9;
+  --accent-hover: #0284c7;
+  --btn-primary: #2d2d2d;
+  --btn-primary-hover: #1a1a1a;
+  --nav-gold: #c9a96e;
+  --success: #059669;
+  --success-bg: #f0fdf4;
+  --error: #dc2626;
+  --error-bg: #fef2f2;
+  --warning: #b45309;
+  --warning-bg: #fffbeb;
 }
 
 @theme inline {
@@ -12,17 +31,51 @@
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: 'Inter', Arial, Helvetica, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Serif headings for editorial feel */
+h1, h2, h3 {
+  font-family: 'Source Serif 4', 'Georgia', serif;
+}
+
+/* Anthropic Academy gold top bar */
+.nav-gold-bar {
+  height: 3px;
+  background: linear-gradient(90deg, #c9a96e, #d4b87a, #c9a96e);
+}
+
+/* Card styles */
+.card-warm {
+  background: #fdf9f4;
+  border: 1px solid var(--warm-border);
+  border-radius: 8px;
+}
+
+.card-warm:hover {
+  border-color: #d4ccc3;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+/* Subtle separator */
+.separator-warm {
+  border-color: var(--warm-border);
+}
+
+/* Link accent style (like Skilljar) */
+a.link-accent {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+a.link-accent:hover {
+  color: var(--accent-hover);
+  text-decoration: underline;
 }
 
 /* Video Player Custom Styles */
@@ -37,7 +90,7 @@ body {
   width: 14px;
   height: 14px;
   border-radius: 50%;
-  background: #3b82f6;
+  background: #2d2d2d;
   cursor: pointer;
   border: 2px solid #ffffff;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
@@ -47,19 +100,19 @@ body {
   width: 14px;
   height: 14px;
   border-radius: 50%;
-  background: #3b82f6;
+  background: #2d2d2d;
   cursor: pointer;
   border: 2px solid #ffffff;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 .slider::-webkit-slider-thumb:hover {
-  background: #2563eb;
+  background: #1a1a1a;
   transform: scale(1.1);
 }
 
 .slider::-moz-range-thumb:hover {
-  background: #2563eb;
+  background: #1a1a1a;
   transform: scale(1.1);
 }
 
@@ -77,4 +130,41 @@ body {
   width: 100%;
   height: 100%;
   object-fit: contain;
+}
+
+/* Smooth transitions */
+* {
+  transition-property: color, background-color, border-color, box-shadow;
+  transition-duration: 150ms;
+  transition-timing-function: ease;
+}
+
+/* Override for elements that shouldn't transition */
+video, .no-transition, .animate-spin {
+  transition: none;
+}
+
+/* Focus styles */
+input:focus, textarea:focus, select:focus {
+  outline: none;
+  border-color: var(--accent) !important;
+  box-shadow: 0 0 0 2px rgba(14, 165, 233, 0.15) !important;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--cream);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--warm-border);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #ccc3b8;
 }

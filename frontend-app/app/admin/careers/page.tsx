@@ -108,9 +108,9 @@ export default function AdminCareersPage() {
   }
 
   function getStatusColor(status: string) {
-    return status === 'active' 
-      ? 'bg-green-100 text-green-800' 
-      : 'bg-gray-100 text-gray-800';
+    return status === 'active'
+      ? 'bg-[var(--success-bg)] text-[var(--success)]'
+      : 'bg-[var(--cream)] text-[var(--text-primary)]';
   }
 
   function getStatusLabel(status: string) {
@@ -119,10 +119,10 @@ export default function AdminCareersPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center bg-[var(--cream)]">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Cargando...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[var(--text-primary)] mx-auto"></div>
+          <p className="mt-4 text-[var(--text-secondary)]">Cargando...</p>
         </div>
       </div>
     );
@@ -137,14 +137,14 @@ export default function AdminCareersPage() {
       <div className="px-4 sm:px-0">
         <div className="mb-8 flex justify-between items-center">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">Gestión de Carreras</h1>
-            <p className="mt-2 text-gray-600">
+            <h1 className="text-3xl font-bold text-[var(--text-primary)] font-serif">Gestión de Carreras</h1>
+            <p className="mt-2 text-[var(--text-secondary)]">
               Crea y gestiona planes de carrera (mínimo 24 cursos)
             </p>
           </div>
           <button
             onClick={() => setShowCreateModal(true)}
-            className="bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors"
+            className="bg-[var(--btn-primary)] text-white px-6 py-3 rounded-lg font-semibold hover:opacity-90 transition-opacity"
           >
             + Crear Carrera
           </button>
@@ -152,15 +152,15 @@ export default function AdminCareersPage() {
 
         {loadingCareers ? (
           <div className="text-center py-12">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-            <p className="mt-4 text-gray-600">Cargando carreras...</p>
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[var(--text-primary)] mx-auto"></div>
+            <p className="mt-4 text-[var(--text-secondary)]">Cargando carreras...</p>
           </div>
         ) : careers.length === 0 ? (
-          <div className="bg-white rounded-lg shadow p-8 text-center">
-            <p className="text-gray-600 mb-4">No hay carreras creadas aún.</p>
+          <div className="bg-[var(--cream-light)] rounded-lg border border-[var(--warm-border)] p-8 text-center">
+            <p className="text-[var(--text-secondary)] mb-4">No hay carreras creadas aún.</p>
             <button
               onClick={() => setShowCreateModal(true)}
-              className="bg-blue-600 text-white px-6 py-2 rounded-lg font-semibold hover:bg-blue-700 transition-colors"
+              className="bg-[var(--btn-primary)] text-white px-6 py-2 rounded-lg font-semibold hover:opacity-90 transition-opacity"
             >
               Crear primera carrera
             </button>
@@ -170,38 +170,38 @@ export default function AdminCareersPage() {
             {careers.map((career) => (
               <div
                 key={career.id}
-                className="bg-white rounded-lg shadow hover:shadow-lg transition-shadow p-6"
+                className="bg-[var(--cream-light)] rounded-lg border border-[var(--warm-border)] hover:border-[var(--accent)] transition-all p-6"
               >
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex-1">
                     <div className="flex items-center mb-2">
-                      <h3 className="text-2xl font-semibold text-gray-900 mr-3">
+                      <h3 className="text-2xl font-semibold text-[var(--text-primary)] mr-3 font-serif">
                         {career.name}
                       </h3>
                       <span
-                        className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(
+                        className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium border border-[var(--warm-border)] ${getStatusColor(
                           career.status
                         )}`}
                       >
                         {getStatusLabel(career.status)}
                       </span>
                     </div>
-                    <p className="text-gray-600 mb-2">{career.description}</p>
-                    <div className="flex items-center space-x-4 text-sm text-gray-500">
-                      <span>📅 {career.total_months} meses</span>
-                      <span>📚 {career.curriculum?.length || 0} cursos</span>
+                    <p className="text-[var(--text-secondary)] mb-2">{career.description}</p>
+                    <div className="flex items-center space-x-4 text-sm text-[var(--text-muted)]">
+                      <span>{career.total_months} meses</span>
+                      <span>{career.curriculum?.length || 0} cursos</span>
                     </div>
                   </div>
                   <div className="flex space-x-2">
                     <Link
                       href={`/admin/careers/${career.id}`}
-                      className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors"
+                      className="bg-[var(--btn-primary)] text-white px-4 py-2 rounded-lg text-sm font-medium hover:opacity-90 transition-opacity"
                     >
                       Gestionar Plan
                     </Link>
                     <button
                       onClick={() => handleDelete(career.id)}
-                      className="bg-red-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-red-700 transition-colors"
+                      className="bg-[var(--error)] text-white px-4 py-2 rounded-lg text-sm font-medium hover:opacity-90 transition-opacity"
                     >
                       Eliminar
                     </button>
@@ -215,14 +215,14 @@ export default function AdminCareersPage() {
         {/* Modal de creación */}
         {showCreateModal && (
           <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
-            <div className="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+            <div className="relative top-20 mx-auto p-5 border border-[var(--warm-border)] w-96 shadow-lg rounded-md bg-[var(--cream-light)]">
               <div className="mt-3">
-                <h3 className="text-lg font-medium text-gray-900 mb-4">
+                <h3 className="text-lg font-medium text-[var(--text-primary)] mb-4 font-serif">
                   Crear Nueva Carrera
                 </h3>
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm font-medium text-[var(--text-primary)] mb-2">
                       Nombre de la Carrera
                     </label>
                     <input
@@ -231,12 +231,12 @@ export default function AdminCareersPage() {
                       onChange={(e) =>
                         setFormData({ ...formData, name: e.target.value })
                       }
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full px-4 py-2 border border-[var(--warm-border)] rounded-lg focus:ring-2 focus:ring-[var(--accent)] focus:border-transparent bg-[var(--cream)]"
                       placeholder="Ej: Desarrollo Full Stack"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm font-medium text-[var(--text-primary)] mb-2">
                       Descripción
                     </label>
                     <textarea
@@ -245,13 +245,13 @@ export default function AdminCareersPage() {
                         setFormData({ ...formData, description: e.target.value })
                       }
                       rows={4}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full px-4 py-2 border border-[var(--warm-border)] rounded-lg focus:ring-2 focus:ring-[var(--accent)] focus:border-transparent bg-[var(--cream)]"
                       placeholder="Descripción de la carrera..."
                     />
                   </div>
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <label className="block text-sm font-medium text-[var(--text-primary)] mb-2">
                         Duración (meses)
                       </label>
                       <input
@@ -263,12 +263,12 @@ export default function AdminCareersPage() {
                             total_months: parseInt(e.target.value) || 24,
                           })
                         }
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        className="w-full px-4 py-2 border border-[var(--warm-border)] rounded-lg focus:ring-2 focus:ring-[var(--accent)] focus:border-transparent bg-[var(--cream)]"
                         min="1"
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <label className="block text-sm font-medium text-[var(--text-primary)] mb-2">
                         Estado
                       </label>
                       <select
@@ -276,7 +276,7 @@ export default function AdminCareersPage() {
                         onChange={(e) =>
                           setFormData({ ...formData, status: e.target.value })
                         }
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        className="w-full px-4 py-2 border border-[var(--warm-border)] rounded-lg focus:ring-2 focus:ring-[var(--accent)] focus:border-transparent bg-[var(--cream)]"
                       >
                         <option value="draft">Borrador</option>
                         <option value="active">Activa</option>
@@ -287,7 +287,7 @@ export default function AdminCareersPage() {
                 <div className="flex space-x-3 mt-6">
                   <button
                     onClick={handleCreate}
-                    className="flex-1 bg-blue-600 text-white py-2 rounded-lg font-medium hover:bg-blue-700 transition-colors"
+                    className="flex-1 bg-[var(--btn-primary)] text-white py-2 rounded-lg font-medium hover:opacity-90 transition-opacity"
                   >
                     Crear
                   </button>
@@ -301,7 +301,7 @@ export default function AdminCareersPage() {
                         status: 'draft',
                       });
                     }}
-                    className="flex-1 bg-gray-300 text-gray-700 py-2 rounded-lg font-medium hover:bg-gray-400 transition-colors"
+                    className="flex-1 bg-[var(--warm-border)] text-[var(--text-primary)] py-2 rounded-lg font-medium hover:opacity-70 transition-opacity"
                   >
                     Cancelar
                   </button>

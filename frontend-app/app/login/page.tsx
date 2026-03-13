@@ -13,7 +13,6 @@ export default function LoginPage() {
   const { login, isAuthenticated, user } = useAuth();
   const router = useRouter();
 
-  // Redirigir según el rol cuando el usuario se autentica
   useEffect(() => {
     if (isAuthenticated && user) {
       const role = user.role;
@@ -34,58 +33,106 @@ export default function LoginPage() {
 
     const success = await login(email, password);
     if (success) {
-      // Esperar a que el estado se actualice
       await new Promise(resolve => setTimeout(resolve, 300));
-      // El useEffect manejará la redirección cuando user se actualice
     } else {
-      setError('Credenciales inválidas');
+      setError('Credenciales invalidas');
       setLoading(false);
     }
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-500 to-purple-600 px-4">
-      <div className="max-w-md w-full bg-white rounded-2xl shadow-xl p-8">
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-800 mb-2">
-            🇵🇪 Plataforma Educativa Nacional
-          </h1>
-          <p className="text-gray-600">Inicia sesión en tu cuenta</p>
+    <div className="min-h-screen" style={{ background: 'var(--cream)' }}>
+      {/* Gold top bar */}
+      <div className="nav-gold-bar" />
+
+      {/* Navigation */}
+      <nav style={{ background: '#ffffff', borderBottom: '1px solid var(--warm-border)' }}>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between h-16 items-center">
+            <Link
+              href="/"
+              className="text-lg tracking-tight"
+              style={{ fontFamily: "'Source Serif 4', Georgia, serif", fontWeight: 600, color: 'var(--text-primary)' }}
+            >
+              DEVTOOLS
+            </Link>
+            <div className="flex items-center space-x-6">
+              <Link href="/courses" className="text-sm" style={{ color: 'var(--text-secondary)' }}>
+                Cursos
+              </Link>
+            </div>
+          </div>
+        </div>
+      </nav>
+
+      {/* Login Form */}
+      <div className="max-w-md mx-auto px-4 pt-16">
+        <div className="flex items-center justify-center space-x-6 mb-10">
+          <span
+            className="text-lg pb-2"
+            style={{
+              fontFamily: "'Source Serif 4', Georgia, serif",
+              fontWeight: 600,
+              color: 'var(--text-primary)',
+              borderBottom: '2px solid var(--text-primary)',
+            }}
+          >
+            Iniciar Sesion
+          </span>
+          <Link
+            href="/register"
+            className="text-lg pb-2"
+            style={{
+              fontFamily: "'Source Serif 4', Georgia, serif",
+              fontWeight: 400,
+              color: 'var(--text-muted)',
+              borderBottom: '2px solid transparent',
+            }}
+          >
+            Registrarse
+          </Link>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <p className="text-sm mb-8 text-center" style={{ color: 'var(--text-secondary)' }}>
+          Inicia sesion con tu cuenta de DevTools Learning.
+        </p>
+
+        <form onSubmit={handleSubmit} className="space-y-5">
           {error && (
-            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
+            <div
+              className="px-4 py-3 rounded text-sm"
+              style={{ background: 'var(--error-bg)', color: 'var(--error)', border: '1px solid #fecaca' }}
+            >
               {error}
             </div>
           )}
 
           <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm mb-2" style={{ color: 'var(--text-secondary)' }}>
               Email
             </label>
             <input
-              id="email"
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-4 py-3 text-sm rounded"
+              style={{ border: '1px solid var(--warm-border)', background: '#ffffff', color: 'var(--text-primary)' }}
               placeholder="tu@email.com"
             />
           </div>
 
           <div>
-            <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
-              Contraseña
+            <label className="block text-sm mb-2" style={{ color: 'var(--text-secondary)' }}>
+              Contrasena
             </label>
             <input
-              id="password"
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-4 py-3 text-sm rounded"
+              style={{ border: '1px solid var(--warm-border)', background: '#ffffff', color: 'var(--text-primary)' }}
               placeholder="••••••••"
             />
           </div>
@@ -93,17 +140,18 @@ export default function LoginPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full py-3 text-sm font-medium rounded disabled:opacity-50 disabled:cursor-not-allowed"
+            style={{ background: 'var(--btn-primary)', color: '#ffffff' }}
           >
-            {loading ? 'Iniciando sesión...' : 'Iniciar Sesión'}
+            {loading ? 'Iniciando sesion...' : 'Iniciar Sesion'}
           </button>
         </form>
 
-        <div className="mt-6 text-center">
-          <p className="text-gray-600">
-            ¿No tienes cuenta?{' '}
-            <Link href="/register" className="text-blue-600 hover:text-blue-700 font-semibold">
-              Regístrate aquí
+        <div className="mt-8 pt-8 text-center" style={{ borderTop: '1px solid var(--warm-border)' }}>
+          <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
+            No tienes cuenta?{' '}
+            <Link href="/register" style={{ color: 'var(--accent)', fontWeight: 500 }}>
+              Registrate aqui
             </Link>
           </p>
         </div>
@@ -111,4 +159,3 @@ export default function LoginPage() {
     </div>
   );
 }
-

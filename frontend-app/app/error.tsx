@@ -8,13 +8,14 @@ export default function Error({
   reset: () => void;
 }) {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50">
+    <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: 'var(--cream)' }}>
       <div className="text-center">
-        <h2 className="text-2xl font-bold text-gray-900 mb-4">Algo salió mal</h2>
-        <p className="text-gray-600 mb-4">{error.message}</p>
+        <h2 className="text-2xl font-bold mb-4" style={{ color: 'var(--text-primary)', fontFamily: "'Source Serif 4', Georgia, serif" }}>Algo salió mal</h2>
+        <p className="mb-4" style={{ color: 'var(--text-secondary)' }}>{error.message}</p>
         <button
           onClick={reset}
-          className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
+          style={{ backgroundColor: 'var(--btn-primary)' }}
+          className="text-white px-4 py-2 rounded-lg hover:opacity-90 transition-opacity"
         >
           Intentar de nuevo
         </button>

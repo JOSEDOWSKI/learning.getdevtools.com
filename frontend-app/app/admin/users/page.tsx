@@ -117,20 +117,20 @@ export default function AdminUsersPage() {
 
   function getRoleColor(role: string) {
     const colors: Record<string, string> = {
-      super_admin: 'bg-purple-100 text-purple-800',
-      profesor: 'bg-blue-100 text-blue-800',
-      alumno: 'bg-green-100 text-green-800',
-      reclutador: 'bg-yellow-100 text-yellow-800',
+      super_admin: 'bg-purple-100 text-purple-800 border-purple-300',
+      profesor: 'bg-blue-100 text-blue-800 border-blue-300',
+      alumno: 'bg-green-100 text-green-800 border-green-300',
+      reclutador: 'bg-yellow-100 text-yellow-800 border-yellow-300',
     };
-    return colors[role] || 'bg-gray-100 text-gray-800';
+    return colors[role] || 'bg-[var(--cream)] text-[var(--text-primary)] border-[var(--warm-border)]';
   }
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center bg-[var(--cream)]">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Cargando...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[var(--text-primary)] mx-auto"></div>
+          <p className="mt-4 text-[var(--text-secondary)]">Cargando...</p>
         </div>
       </div>
     );
@@ -144,46 +144,46 @@ export default function AdminUsersPage() {
     <Layout>
       <div className="px-4 sm:px-0">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">Gestión de Usuarios</h1>
-          <p className="mt-2 text-gray-600">
+          <h1 className="text-3xl font-bold text-[var(--text-primary)] font-serif">Gestión de Usuarios</h1>
+          <p className="mt-2 text-[var(--text-secondary)]">
             Administra todos los usuarios de la plataforma
           </p>
         </div>
 
         {loadingUsers ? (
           <div className="text-center py-12">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-            <p className="mt-4 text-gray-600">Cargando usuarios...</p>
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[var(--text-primary)] mx-auto"></div>
+            <p className="mt-4 text-[var(--text-secondary)]">Cargando usuarios...</p>
           </div>
         ) : (
-          <div className="bg-white shadow overflow-hidden sm:rounded-md">
-            <ul className="divide-y divide-gray-200">
+          <div className="bg-[var(--cream-light)] border border-[var(--warm-border)] overflow-hidden sm:rounded-md">
+            <ul className="divide-y divide-[var(--warm-border)]">
               {users.map((user) => (
                 <li key={user.id}>
                   <div className="px-4 py-4 sm:px-6 flex items-center justify-between">
                     <div className="flex items-center">
                       <div className="flex-shrink-0">
-                        <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center">
-                          <span className="text-blue-600 font-semibold">
+                        <div className="h-10 w-10 rounded-full bg-[var(--accent)]/20 flex items-center justify-center">
+                          <span className="text-[var(--accent)] font-semibold">
                             {user.full_name.charAt(0).toUpperCase()}
                           </span>
                         </div>
                       </div>
                       <div className="ml-4">
                         <div className="flex items-center">
-                          <p className="text-sm font-medium text-gray-900">
+                          <p className="text-sm font-medium text-[var(--text-primary)]">
                             {user.full_name}
                           </p>
                           <span
-                            className={`ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getRoleColor(
+                            className={`ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${getRoleColor(
                               user.role
                             )}`}
                           >
                             {getRoleLabel(user.role)}
                           </span>
                         </div>
-                        <p className="text-sm text-gray-500">{user.email}</p>
-                        <p className="text-xs text-gray-400">
+                        <p className="text-sm text-[var(--text-secondary)]">{user.email}</p>
+                        <p className="text-xs text-[var(--text-muted)]">
                           DNI: {user.dni} • Registrado: {new Date(user.created_at).toLocaleDateString()}
                         </p>
                       </div>
@@ -191,13 +191,13 @@ export default function AdminUsersPage() {
                     <div className="flex space-x-2">
                       <button
                         onClick={() => handleEdit(user)}
-                        className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors"
+                        className="bg-[var(--btn-primary)] text-white px-4 py-2 rounded-lg text-sm font-medium hover:opacity-90 transition-opacity"
                       >
                         Editar
                       </button>
                       <button
                         onClick={() => handleDelete(user.id)}
-                        className="bg-red-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-red-700 transition-colors"
+                        className="bg-[var(--error)] text-white px-4 py-2 rounded-lg text-sm font-medium hover:opacity-90 transition-opacity"
                       >
                         Eliminar
                       </button>
@@ -212,14 +212,14 @@ export default function AdminUsersPage() {
         {/* Modal de edición */}
         {showEditModal && (
           <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
-            <div className="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+            <div className="relative top-20 mx-auto p-5 border border-[var(--warm-border)] w-96 shadow-lg rounded-md bg-[var(--cream-light)]">
               <div className="mt-3">
-                <h3 className="text-lg font-medium text-gray-900 mb-4">
+                <h3 className="text-lg font-medium text-[var(--text-primary)] mb-4 font-serif">
                   Editar Usuario
                 </h3>
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm font-medium text-[var(--text-primary)] mb-2">
                       Nombre Completo
                     </label>
                     <input
@@ -228,11 +228,11 @@ export default function AdminUsersPage() {
                       onChange={(e) =>
                         setFormData({ ...formData, full_name: e.target.value })
                       }
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full px-4 py-2 border border-[var(--warm-border)] rounded-lg focus:ring-2 focus:ring-[var(--accent)] focus:border-transparent bg-[var(--cream)]"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm font-medium text-[var(--text-primary)] mb-2">
                       Email
                     </label>
                     <input
@@ -241,11 +241,11 @@ export default function AdminUsersPage() {
                       onChange={(e) =>
                         setFormData({ ...formData, email: e.target.value })
                       }
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full px-4 py-2 border border-[var(--warm-border)] rounded-lg focus:ring-2 focus:ring-[var(--accent)] focus:border-transparent bg-[var(--cream)]"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm font-medium text-[var(--text-primary)] mb-2">
                       Rol
                     </label>
                     <select
@@ -253,7 +253,7 @@ export default function AdminUsersPage() {
                       onChange={(e) =>
                         setFormData({ ...formData, role: e.target.value })
                       }
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full px-4 py-2 border border-[var(--warm-border)] rounded-lg focus:ring-2 focus:ring-[var(--accent)] focus:border-transparent bg-[var(--cream)]"
                     >
                       <option value="alumno">Alumno</option>
                       <option value="profesor">Profesor</option>
@@ -265,7 +265,7 @@ export default function AdminUsersPage() {
                 <div className="flex space-x-3 mt-6">
                   <button
                     onClick={handleUpdate}
-                    className="flex-1 bg-blue-600 text-white py-2 rounded-lg font-medium hover:bg-blue-700 transition-colors"
+                    className="flex-1 bg-[var(--btn-primary)] text-white py-2 rounded-lg font-medium hover:opacity-90 transition-opacity"
                   >
                     Guardar
                   </button>
@@ -274,7 +274,7 @@ export default function AdminUsersPage() {
                       setShowEditModal(false);
                       setEditingUser(null);
                     }}
-                    className="flex-1 bg-gray-300 text-gray-700 py-2 rounded-lg font-medium hover:bg-gray-400 transition-colors"
+                    className="flex-1 bg-[var(--warm-border)] text-[var(--text-primary)] py-2 rounded-lg font-medium hover:opacity-70 transition-opacity"
                   >
                     Cancelar
                   </button>

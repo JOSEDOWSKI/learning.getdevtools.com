@@ -178,7 +178,7 @@ export default function EditCoursePage() {
     }
 
     try {
-      const response = type === 'video' 
+      const response = type === 'video'
         ? await api.uploadVideo(lessonId, file)
         : await api.uploadPdf(lessonId, file);
 
@@ -218,10 +218,10 @@ export default function EditCoursePage() {
 
   if (loading || loadingCourse || !isAuthenticated || user?.role !== 'profesor') {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: 'var(--cream)' }}>
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Cargando...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 mx-auto" style={{ borderColor: 'var(--text-primary)' }}></div>
+          <p className="mt-4" style={{ color: 'var(--text-secondary)' }}>Cargando...</p>
         </div>
       </div>
     );
@@ -230,8 +230,8 @@ export default function EditCoursePage() {
   if (!course) {
     return (
       <Layout>
-        <div className="bg-white rounded-lg shadow p-8 text-center">
-          <p className="text-gray-600">Curso no encontrado.</p>
+        <div className="rounded-lg shadow p-8 text-center card-warm" style={{ backgroundColor: 'white', border: '1px solid var(--warm-border)' }}>
+          <p style={{ color: 'var(--text-secondary)' }}>Curso no encontrado.</p>
         </div>
       </Layout>
     );
@@ -241,28 +241,30 @@ export default function EditCoursePage() {
 
   return (
     <Layout>
-      <div className="px-4 sm:px-0">
+      <div className="px-4 sm:px-0" style={{ backgroundColor: 'var(--cream)' }}>
         <div className="mb-8">
           <button
             onClick={() => router.push('/professor/courses')}
-            className="text-blue-600 hover:text-blue-700 mb-4"
+            style={{ color: 'var(--accent)' }}
+            className="hover:opacity-80 mb-4"
           >
             ← Volver a Mis Cursos
           </button>
-          <h1 className="text-3xl font-bold text-gray-900">
+          <h1 className="text-3xl font-bold" style={{ color: 'var(--text-primary)', fontFamily: "'Source Serif 4', Georgia, serif" }}>
             Editar Curso: {course.title}
           </h1>
-          <p className="mt-2 text-gray-600">
+          <p className="mt-2" style={{ color: 'var(--text-secondary)' }}>
             Gestiona el contenido y las lecciones de tu curso
           </p>
         </div>
 
-        <div className="bg-white rounded-lg shadow p-6 mb-6">
+        <div className="rounded-lg shadow p-6 mb-6 card-warm" style={{ backgroundColor: 'white', border: '1px solid var(--warm-border)' }}>
           <div className="flex justify-between items-center mb-4">
-            <h2 className="text-xl font-semibold text-gray-900">Lecciones</h2>
+            <h2 className="text-xl font-semibold" style={{ color: 'var(--text-primary)', fontFamily: "'Source Serif 4', Georgia, serif" }}>Lecciones</h2>
             <button
               onClick={openCreateLessonModal}
-              className="bg-blue-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-blue-700 transition-colors"
+              style={{ backgroundColor: 'var(--btn-primary)' }}
+              className="text-white px-4 py-2 rounded-lg font-semibold hover:opacity-90 transition-opacity"
             >
               + Agregar Lección
             </button>
@@ -270,11 +272,11 @@ export default function EditCoursePage() {
 
           {loadingLessons ? (
             <div className="text-center py-8">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
-              <p className="mt-2 text-gray-600">Cargando lecciones...</p>
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 mx-auto" style={{ borderColor: 'var(--text-primary)' }}></div>
+              <p className="mt-2" style={{ color: 'var(--text-secondary)' }}>Cargando lecciones...</p>
             </div>
           ) : sortedLessons.length === 0 ? (
-            <div className="text-center py-8 text-gray-600">
+            <div className="text-center py-8" style={{ color: 'var(--text-secondary)' }}>
               <p>No hay lecciones aún. Crea tu primera lección para comenzar.</p>
             </div>
           ) : (
@@ -282,29 +284,30 @@ export default function EditCoursePage() {
               {sortedLessons.map((lesson) => (
                 <div
                   key={lesson.id}
-                  className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow"
+                  className="border rounded-lg p-4 hover:shadow-md transition-shadow"
+                  style={{ borderColor: 'var(--warm-border)' }}
                 >
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
                       <div className="flex items-center gap-3 mb-2">
-                        <span className="text-sm font-medium text-gray-500 bg-gray-100 px-2 py-1 rounded">
+                        <span className="text-sm font-medium px-2 py-1 rounded" style={{ backgroundColor: 'var(--cream-light)', color: 'var(--text-secondary)', border: '1px solid var(--warm-border)' }}>
                           #{lesson.order_index + 1}
                         </span>
-                        <h3 className="text-lg font-semibold text-gray-900">
+                        <h3 className="text-lg font-semibold" style={{ color: 'var(--text-primary)', fontFamily: "'Source Serif 4', Georgia, serif" }}>
                           {lesson.title}
                         </h3>
                       </div>
                       {lesson.content && (
-                        <p className="text-gray-600 text-sm line-clamp-2 mb-3">
+                        <p style={{ color: 'var(--text-secondary)' }} className="text-sm line-clamp-2 mb-3">
                           {lesson.content}
                         </p>
                       )}
                       <div className="flex gap-4 mt-3">
                         {lesson.video_url ? (
-                          <span className="text-sm text-green-600">✓ Video subido</span>
+                          <span className="text-sm" style={{ color: 'var(--success)' }}>Video subido</span>
                         ) : (
-                          <label className="text-sm text-blue-600 cursor-pointer hover:text-blue-700">
-                            📹 Subir Video
+                          <label className="text-sm cursor-pointer" style={{ color: 'var(--accent)' }}>
+                            Subir Video
                             <input
                               type="file"
                               accept="video/*"
@@ -318,10 +321,10 @@ export default function EditCoursePage() {
                           </label>
                         )}
                         {lesson.pdf_url ? (
-                          <span className="text-sm text-green-600">✓ PDF subido</span>
+                          <span className="text-sm" style={{ color: 'var(--success)' }}>PDF subido</span>
                         ) : (
-                          <label className="text-sm text-blue-600 cursor-pointer hover:text-blue-700">
-                            📄 Subir PDF
+                          <label className="text-sm cursor-pointer" style={{ color: 'var(--accent)' }}>
+                            Subir PDF
                             <input
                               type="file"
                               accept="application/pdf"
@@ -335,20 +338,22 @@ export default function EditCoursePage() {
                           </label>
                         )}
                         {(uploadingVideo === lesson.id || uploadingPdf === lesson.id) && (
-                          <span className="text-sm text-gray-500">Subiendo...</span>
+                          <span className="text-sm" style={{ color: 'var(--text-muted)' }}>Subiendo...</span>
                         )}
                       </div>
                     </div>
                     <div className="flex gap-2 ml-4">
                       <button
                         onClick={() => openEditLessonModal(lesson)}
-                        className="text-blue-600 hover:text-blue-700 font-medium text-sm"
+                        style={{ color: 'var(--accent)' }}
+                        className="hover:opacity-80 font-medium text-sm"
                       >
                         Editar
                       </button>
                       <button
                         onClick={() => handleDeleteLesson(lesson.id)}
-                        className="text-red-600 hover:text-red-700 font-medium text-sm"
+                        style={{ color: 'var(--error)' }}
+                        className="hover:opacity-80 font-medium text-sm"
                       >
                         Eliminar
                       </button>
@@ -363,15 +368,15 @@ export default function EditCoursePage() {
 
       {/* Modal de Lección */}
       {showLessonModal && (
-        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
-          <div className="relative top-20 mx-auto p-5 border w-full max-w-2xl shadow-lg rounded-md bg-white">
+        <div className="fixed inset-0 bg-black bg-opacity-30 overflow-y-auto h-full w-full z-50">
+          <div className="relative top-20 mx-auto p-5 border w-full max-w-2xl shadow-lg rounded-md" style={{ backgroundColor: 'white', border: '1px solid var(--warm-border)' }}>
             <div className="mt-3">
-              <h3 className="text-lg font-medium text-gray-900 mb-4">
+              <h3 className="text-lg font-medium mb-4" style={{ color: 'var(--text-primary)', fontFamily: "'Source Serif 4', Georgia, serif" }}>
                 {editingLesson ? 'Editar Lección' : 'Nueva Lección'}
               </h3>
               <form onSubmit={handleSaveLesson} className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-primary)' }}>
                     Título de la Lección *
                   </label>
                   <input
@@ -381,12 +386,13 @@ export default function EditCoursePage() {
                       setLessonForm({ ...lessonForm, title: e.target.value })
                     }
                     required
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:border-transparent"
+                    style={{ borderColor: 'var(--warm-border)' }}
                     placeholder="Ej: Introducción a React"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-primary)' }}>
                     Contenido
                   </label>
                   <textarea
@@ -395,12 +401,13 @@ export default function EditCoursePage() {
                       setLessonForm({ ...lessonForm, content: e.target.value })
                     }
                     rows={10}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:border-transparent"
+                    style={{ borderColor: 'var(--warm-border)' }}
                     placeholder="Escribe el contenido de la lección aquí. Puedes usar Markdown para formatear el texto."
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-primary)' }}>
                     Orden
                   </label>
                   <input
@@ -413,9 +420,10 @@ export default function EditCoursePage() {
                       })
                     }
                     min="0"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:border-transparent"
+                    style={{ borderColor: 'var(--warm-border)' }}
                   />
-                  <p className="text-xs text-gray-500 mt-1">
+                  <p className="text-xs mt-1" style={{ color: 'var(--text-muted)' }}>
                     El orden determina la secuencia de las lecciones (0 = primera, 1 = segunda, etc.)
                   </p>
                 </div>
@@ -423,14 +431,16 @@ export default function EditCoursePage() {
                   <button
                     type="button"
                     onClick={() => setShowLessonModal(false)}
-                    className="flex-1 bg-gray-300 text-gray-700 py-2 rounded-lg font-medium hover:bg-gray-400 transition-colors"
+                    style={{ backgroundColor: 'var(--text-muted)' }}
+                    className="flex-1 text-white py-2 rounded-lg font-medium hover:opacity-90 transition-opacity"
                   >
                     Cancelar
                   </button>
                   <button
                     type="submit"
                     disabled={saving}
-                    className="flex-1 bg-blue-600 text-white py-2 rounded-lg font-medium hover:bg-blue-700 transition-colors disabled:opacity-50"
+                    style={{ backgroundColor: 'var(--btn-primary)' }}
+                    className="flex-1 text-white py-2 rounded-lg font-medium hover:opacity-90 transition-opacity disabled:opacity-50"
                   >
                     {saving ? 'Guardando...' : editingLesson ? 'Actualizar' : 'Crear'}
                   </button>

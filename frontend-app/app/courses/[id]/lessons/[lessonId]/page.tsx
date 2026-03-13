@@ -229,10 +229,10 @@ export default function LessonViewPage() {
 
   if (loading || loadingLesson || !isAuthenticated) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: 'var(--cream)' }}>
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Cargando lección...</p>
+          <div className="animate-spin rounded-full h-12 w-12 mx-auto" style={{ borderColor: 'var(--text-primary)', borderTopColor: 'transparent', borderWidth: '3px' }}></div>
+          <p className="mt-4" style={{ color: 'var(--text-secondary)' }}>Cargando lección...</p>
         </div>
       </div>
     );
@@ -241,8 +241,8 @@ export default function LessonViewPage() {
   if (!lesson) {
     return (
       <Layout>
-        <div className="bg-white rounded-lg shadow p-8 text-center">
-          <p className="text-gray-600">Lección no encontrada.</p>
+        <div className="rounded-lg p-8 text-center" style={{ backgroundColor: 'var(--cream-light)', border: '1px solid var(--warm-border)' }}>
+          <p style={{ color: 'var(--text-secondary)' }}>Lección no encontrada.</p>
         </div>
       </Layout>
     );
@@ -253,22 +253,23 @@ export default function LessonViewPage() {
 
   return (
     <Layout>
-      <div className="px-4 sm:px-0">
+      <div className="px-4 sm:px-0" style={{ backgroundColor: 'var(--cream)' }}>
         <div className="mb-6">
           <button
             onClick={() => router.push(`/courses/${courseId}`)}
-            className="text-blue-600 hover:text-blue-700 mb-4"
+            className="mb-4 transition-colors"
+            style={{ color: 'var(--accent)' }}
           >
             ← Volver al Curso
           </button>
-          <h1 className="text-3xl font-bold text-gray-900">{lesson.title}</h1>
+          <h1 className="text-3xl font-bold" style={{ color: 'var(--text-primary)', fontFamily: "'Source Serif 4', Georgia, serif" }}>{lesson.title}</h1>
           <div className="mt-2 flex items-center gap-4">
-            <span className="text-sm text-gray-500">
+            <span className="text-sm" style={{ color: 'var(--text-muted)' }}>
               Progreso: {Math.round(videoProgress)}%
             </span>
             {isVideoCompleted && (
-              <span className="text-sm text-green-600 font-medium">
-                ✓ Completada
+              <span className="text-sm font-medium" style={{ color: 'var(--success)' }}>
+                Completada
               </span>
             )}
           </div>
@@ -279,8 +280,8 @@ export default function LessonViewPage() {
           <div className="lg:col-span-2 space-y-6">
             {/* Video Mejorado */}
             {videoUrl && (
-              <div className="bg-white rounded-lg shadow-lg overflow-hidden">
-                <h2 className="text-xl font-semibold text-gray-900 mb-4 p-4 pb-0">
+              <div className="rounded-lg overflow-hidden" style={{ backgroundColor: 'var(--cream-light)', border: '2px solid var(--warm-border)' }}>
+                <h2 className="text-xl font-semibold mb-4 p-4 pb-0" style={{ color: 'var(--text-primary)', fontFamily: "'Source Serif 4', Georgia, serif" }}>
                   Video de la Lección
                 </h2>
                 <div className="relative w-full bg-black" style={{ paddingBottom: '56.25%' }}>
@@ -306,7 +307,7 @@ export default function LessonViewPage() {
                   {isVideoLoading && (
                     <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50">
                       <div className="text-center">
-                        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto"></div>
+                        <div className="animate-spin rounded-full h-12 w-12 mx-auto" style={{ borderColor: 'white', borderTopColor: 'transparent', borderWidth: '3px' }}></div>
                         <p className="mt-4 text-white text-sm">Cargando video...</p>
                       </div>
                     </div>
@@ -325,7 +326,8 @@ export default function LessonViewPage() {
                               videoRef.current.load();
                             }
                           }}
-                          className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+                          className="px-4 py-2 text-white rounded transition-colors hover:opacity-90"
+                          style={{ backgroundColor: 'var(--btn-primary)' }}
                         >
                           Reintentar
                         </button>
@@ -344,9 +346,9 @@ export default function LessonViewPage() {
                           max={duration || 0}
                           value={currentTime}
                           onChange={handleSeek}
-                          className="w-full h-1 bg-gray-600 rounded-lg appearance-none cursor-pointer slider"
+                          className="w-full h-1 rounded-lg appearance-none cursor-pointer slider"
                           style={{
-                            background: `linear-gradient(to right, #3b82f6 0%, #3b82f6 ${(currentTime / (duration || 1)) * 100}%, #4b5563 ${(currentTime / (duration || 1)) * 100}%, #4b5563 100%)`
+                            background: `linear-gradient(to right, var(--accent) 0%, var(--accent) ${(currentTime / (duration || 1)) * 100}%, #4b5563 ${(currentTime / (duration || 1)) * 100}%, #4b5563 100%)`
                           }}
                         />
                       </div>
@@ -357,7 +359,9 @@ export default function LessonViewPage() {
                           {/* Play/Pause */}
                           <button
                             onClick={handlePlayPause}
-                            className="p-2 hover:bg-white/20 rounded transition-colors"
+                            className="p-2 rounded transition-colors"
+                            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.2)'}
+                            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
                             aria-label={isPlaying ? 'Pausar' : 'Reproducir'}
                           >
                             {isPlaying ? (
@@ -375,7 +379,9 @@ export default function LessonViewPage() {
                           <div className="flex items-center gap-2">
                             <button
                               onClick={handleMuteToggle}
-                              className="p-2 hover:bg-white/20 rounded transition-colors"
+                              className="p-2 rounded transition-colors"
+                              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.2)'}
+                              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
                               aria-label={isMuted ? 'Activar sonido' : 'Silenciar'}
                             >
                               {isMuted || volume === 0 ? (
@@ -395,7 +401,8 @@ export default function LessonViewPage() {
                               step="0.1"
                               value={isMuted ? 0 : volume}
                               onChange={handleVolumeChange}
-                              className="w-20 h-1 bg-gray-600 rounded-lg appearance-none cursor-pointer"
+                              className="w-20 h-1 rounded-lg appearance-none cursor-pointer"
+                              style={{ backgroundColor: '#4b5563' }}
                             />
                           </div>
 
@@ -410,7 +417,10 @@ export default function LessonViewPage() {
                           <div className="flex items-center gap-1">
                             <button
                               onClick={() => handlePlaybackRateChange(playbackRate === 0.75 ? 1 : playbackRate === 1 ? 1.25 : playbackRate === 1.25 ? 1.5 : playbackRate === 1.5 ? 2 : 0.75)}
-                              className="px-2 py-1 text-sm bg-white/20 hover:bg-white/30 rounded transition-colors"
+                              className="px-2 py-1 text-sm rounded transition-colors"
+                              style={{ backgroundColor: 'rgba(255, 255, 255, 0.2)' }}
+                              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.3)'}
+                              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.2)'}
                             >
                               {playbackRate}x
                             </button>
@@ -425,7 +435,9 @@ export default function LessonViewPage() {
                                 }
                               }
                             }}
-                            className="p-2 hover:bg-white/20 rounded transition-colors"
+                            className="p-2 rounded transition-colors"
+                            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.2)'}
+                            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
                             aria-label="Pantalla completa"
                           >
                             <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
@@ -440,14 +452,14 @@ export default function LessonViewPage() {
 
                 {/* Progress Summary */}
                 <div className="p-4 pt-2">
-                  <div className="flex items-center justify-between text-sm text-gray-600 mb-2">
+                  <div className="flex items-center justify-between text-sm mb-2" style={{ color: 'var(--text-secondary)' }}>
                     <span>Progreso de visualización</span>
                     <span>{Math.round(videoProgress)}%</span>
                   </div>
-                  <div className="w-full bg-gray-200 rounded-full h-2">
+                  <div className="w-full rounded-full h-2" style={{ backgroundColor: 'var(--cream)', border: '1px solid var(--warm-border)' }}>
                     <div
-                      className="bg-blue-600 h-2 rounded-full transition-all"
-                      style={{ width: `${videoProgress}%` }}
+                      className="h-2 rounded-full transition-all"
+                      style={{ backgroundColor: 'var(--text-primary)', width: `${videoProgress}%` }}
                     ></div>
                   </div>
                 </div>
@@ -456,20 +468,22 @@ export default function LessonViewPage() {
 
             {/* PDF */}
             {pdfUrl && (
-              <div className="bg-white rounded-lg shadow p-4">
-                <h2 className="text-xl font-semibold text-gray-900 mb-4">
+              <div className="rounded-lg p-4" style={{ backgroundColor: 'var(--cream-light)', border: '2px solid var(--warm-border)' }}>
+                <h2 className="text-xl font-semibold mb-4" style={{ color: 'var(--text-primary)', fontFamily: "'Source Serif 4', Georgia, serif" }}>
                   Material de Lectura
                 </h2>
                 <iframe
                   src={pdfUrl}
-                  className="w-full h-96 rounded-lg border"
+                  className="w-full h-96 rounded-lg"
+                  style={{ border: '1px solid var(--warm-border)' }}
                   title="PDF Viewer"
                 ></iframe>
                 <a
                   href={pdfUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="mt-4 inline-block text-blue-600 hover:text-blue-700"
+                  className="mt-4 inline-block transition-colors"
+                  style={{ color: 'var(--accent)' }}
                 >
                   Abrir PDF en nueva pestaña
                 </a>
@@ -478,12 +492,12 @@ export default function LessonViewPage() {
 
             {/* Contenido de Texto */}
             {lesson.content && (
-              <div className="bg-white rounded-lg shadow p-6">
-                <h2 className="text-xl font-semibold text-gray-900 mb-4">
+              <div className="rounded-lg p-6" style={{ backgroundColor: 'var(--cream-light)', border: '2px solid var(--warm-border)' }}>
+                <h2 className="text-xl font-semibold mb-4" style={{ color: 'var(--text-primary)', fontFamily: "'Source Serif 4', Georgia, serif" }}>
                   Contenido
                 </h2>
                 <div className="prose max-w-none">
-                  <pre className="whitespace-pre-wrap text-sm bg-gray-50 p-4 rounded">
+                  <pre className="whitespace-pre-wrap text-sm p-4 rounded" style={{ backgroundColor: 'var(--cream)', border: '1px solid var(--warm-border)', color: 'var(--text-secondary)' }}>
                     {lesson.content}
                   </pre>
                 </div>
@@ -493,43 +507,45 @@ export default function LessonViewPage() {
 
           {/* Sidebar - Notas y Progreso */}
           <div className="lg:col-span-1">
-            <div className="bg-white rounded-lg shadow p-6 sticky top-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">
+            <div className="rounded-lg p-6 sticky top-6" style={{ backgroundColor: 'var(--cream-light)', border: '2px solid var(--warm-border)' }}>
+              <h3 className="text-lg font-semibold mb-4" style={{ color: 'var(--text-primary)', fontFamily: "'Source Serif 4', Georgia, serif" }}>
                 Mis Notas
               </h3>
               <textarea
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
                 rows={8}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent mb-4"
+                className="w-full px-4 py-2 rounded-lg focus:outline-none focus:ring-2 mb-4 transition-colors"
+                style={{ border: '1px solid var(--warm-border)', backgroundColor: 'var(--cream)', color: 'var(--text-primary)' }}
                 placeholder="Escribe tus notas aquí..."
               />
               <button
                 onClick={handleSaveNotes}
                 disabled={savingNotes}
-                className="w-full bg-blue-600 text-white py-2 rounded-lg font-semibold hover:bg-blue-700 transition-colors disabled:opacity-50"
+                className="w-full text-white py-2 rounded font-semibold transition-colors hover:opacity-90 disabled:opacity-50"
+                style={{ backgroundColor: 'var(--btn-primary)' }}
               >
                 {savingNotes ? 'Guardando...' : 'Guardar Notas'}
               </button>
 
-              <div className="mt-6 pt-6 border-t">
-                <h4 className="text-sm font-semibold text-gray-700 mb-2">
+              <div className="mt-6 pt-6" style={{ borderTop: '1px solid var(--warm-border)' }}>
+                <h4 className="text-sm font-semibold mb-2" style={{ color: 'var(--text-primary)' }}>
                   Progreso de la Lección
                 </h4>
                 <div className="space-y-2">
                   <div className="flex justify-between text-sm">
-                    <span className="text-gray-600">Completado</span>
-                    <span className="font-medium">{Math.round(videoProgress)}%</span>
+                    <span style={{ color: 'var(--text-secondary)' }}>Completado</span>
+                    <span className="font-medium" style={{ color: 'var(--text-primary)' }}>{Math.round(videoProgress)}%</span>
                   </div>
-                  <div className="w-full bg-gray-200 rounded-full h-2">
+                  <div className="w-full rounded-full h-2" style={{ backgroundColor: 'var(--cream)', border: '1px solid var(--warm-border)' }}>
                     <div
-                      className="bg-green-600 h-2 rounded-full transition-all"
-                      style={{ width: `${videoProgress}%` }}
+                      className="h-2 rounded-full transition-all"
+                      style={{ backgroundColor: 'var(--success)', width: `${videoProgress}%` }}
                     ></div>
                   </div>
                   {isVideoCompleted && (
-                    <p className="text-sm text-green-600 font-medium mt-2">
-                      ✓ Lección completada
+                    <p className="text-sm font-medium mt-2" style={{ color: 'var(--success)' }}>
+                      Lección completada
                     </p>
                   )}
                 </div>

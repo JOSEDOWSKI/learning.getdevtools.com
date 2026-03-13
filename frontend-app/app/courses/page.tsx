@@ -46,59 +46,61 @@ export default function CoursesPage() {
 
   if (loading || !isAuthenticated) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: 'var(--cream)' }}>
+        <div className="animate-spin rounded-full h-12 w-12" style={{ borderColor: 'var(--text-primary)', borderTopColor: 'transparent', borderWidth: '3px' }}></div>
       </div>
     );
   }
 
   return (
     <Layout>
-      <div className="px-4 sm:px-0">
+      <div className="px-4 sm:px-0" style={{ backgroundColor: 'var(--cream)' }}>
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">Cursos Disponibles</h1>
-          <p className="mt-2 text-gray-600">
+          <h1 className="text-3xl font-bold" style={{ color: 'var(--text-primary)', fontFamily: "'Source Serif 4', Georgia, serif" }}>Cursos Disponibles</h1>
+          <p className="mt-2" style={{ color: 'var(--text-secondary)' }}>
             Explora todos los cursos disponibles en la plataforma
           </p>
         </div>
 
         {loadingCourses ? (
           <div className="text-center py-12">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-            <p className="mt-4 text-gray-600">Cargando cursos...</p>
+            <div className="animate-spin rounded-full h-12 w-12 mx-auto" style={{ borderColor: 'var(--text-primary)', borderTopColor: 'transparent', borderWidth: '3px' }}></div>
+            <p className="mt-4" style={{ color: 'var(--text-secondary)' }}>Cargando cursos...</p>
           </div>
         ) : courses.length === 0 ? (
-          <div className="bg-white rounded-lg shadow p-8 text-center">
-            <p className="text-gray-600">No hay cursos disponibles aún.</p>
+          <div className="rounded-lg p-8 text-center" style={{ backgroundColor: 'var(--cream-light)', border: '1px solid var(--warm-border)' }}>
+            <p style={{ color: 'var(--text-secondary)' }}>No hay cursos disponibles aún.</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {courses.map((course) => (
               <div
                 key={course.id}
-                className="bg-white rounded-lg shadow hover:shadow-lg transition-shadow p-6"
+                className="rounded-lg p-6 hover:shadow-md transition-shadow"
+                style={{ backgroundColor: 'var(--cream-light)', border: '2px solid var(--warm-border)' }}
               >
-                <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                <h3 className="text-xl font-semibold mb-2" style={{ color: 'var(--text-primary)', fontFamily: "'Source Serif 4', Georgia, serif" }}>
                   {course.title}
                 </h3>
                 {course.description && (
-                  <p className="text-gray-600 text-sm mb-4 line-clamp-3">
+                  <p className="text-sm mb-4 line-clamp-3" style={{ color: 'var(--text-secondary)' }}>
                     {course.description}
                   </p>
                 )}
-                <div className="flex items-center justify-between text-sm text-gray-500 mb-4">
-                  <span>📚 {course.credits} créditos</span>
+                <div className="flex items-center justify-between text-sm mb-4">
+                  <span style={{ color: 'var(--text-muted)' }}>{course.credits} créditos</span>
                   {course.professor && (
-                    <span>👨‍🏫 {course.professor.full_name}</span>
+                    <span style={{ color: 'var(--text-muted)' }}>{course.professor.full_name}</span>
                   )}
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-lg font-bold text-blue-600">
+                  <span className="text-lg font-bold" style={{ color: 'var(--accent)' }}>
                     S/ {course.base_price}
                   </span>
                   <Link
                     href={`/courses/${course.id}`}
-                    className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors"
+                    className="text-white px-4 py-2 rounded text-sm font-medium transition-colors hover:opacity-90"
+                    style={{ backgroundColor: 'var(--btn-primary)' }}
                   >
                     Ver Detalles
                   </Link>

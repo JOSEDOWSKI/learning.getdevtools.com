@@ -93,8 +93,8 @@ export default function CareersPage() {
 
   if (loading || !isAuthenticated) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      <div className="min-h-screen flex items-center justify-center bg-[var(--cream)]">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[var(--text-primary)]"></div>
       </div>
     );
   }
@@ -103,16 +103,16 @@ export default function CareersPage() {
     <Layout>
       <div className="px-4 sm:px-0">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">Carreras</h1>
-          <p className="mt-2 text-gray-600">
-            {user?.role === 'profesor' 
+          <h1 className="text-3xl font-bold text-[var(--text-primary)] font-serif">Carreras</h1>
+          <p className="mt-2 text-[var(--text-secondary)]">
+            {user?.role === 'profesor'
               ? 'Carreras donde están tus cursos. El administrador asigna los cursos a las carreras.'
               : 'Explora las carreras completas de 24 meses'}
           </p>
           {user?.role === 'profesor' && (
-            <div className="mt-4 bg-blue-50 border border-blue-200 rounded-lg p-4">
-              <p className="text-sm text-blue-800">
-                <strong>💡 Proceso:</strong> Crea tus cursos en "Mis Cursos" y el administrador los asignará a las carreras correspondientes.
+            <div className="mt-4 bg-[var(--cream-light)] border border-[var(--warm-border)] rounded-lg p-4">
+              <p className="text-sm text-[var(--text-primary)]">
+                <strong>Proceso:</strong> Crea tus cursos en "Mis Cursos" y el administrador los asignará a las carreras correspondientes.
               </p>
             </div>
           )}
@@ -120,45 +120,45 @@ export default function CareersPage() {
 
         {loadingCareers ? (
           <div className="text-center py-12">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-            <p className="mt-4 text-gray-600">Cargando carreras...</p>
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[var(--text-primary)] mx-auto"></div>
+            <p className="mt-4 text-[var(--text-secondary)]">Cargando carreras...</p>
           </div>
         ) : careers.length === 0 ? (
-          <div className="bg-white rounded-lg shadow p-8 text-center">
-            <p className="text-gray-600">No hay carreras disponibles aún.</p>
+          <div className="bg-[var(--cream-light)] rounded-lg border border-[var(--warm-border)] p-8 text-center">
+            <p className="text-[var(--text-secondary)]">No hay carreras disponibles aún.</p>
           </div>
         ) : (
           <div className="space-y-6">
             {careers.map((career) => (
               <div
                 key={career.id}
-                className="bg-white rounded-lg shadow hover:shadow-lg transition-shadow p-6"
+                className="bg-[var(--cream-light)] rounded-lg border border-[var(--warm-border)] hover:border-[var(--accent)] transition-all p-6"
               >
                 <div className="flex items-start justify-between mb-4">
                   <div>
-                    <h3 className="text-2xl font-semibold text-gray-900 mb-2">
+                    <h3 className="text-2xl font-semibold text-[var(--text-primary)] mb-2 font-serif">
                       {career.name}
                     </h3>
-                    <p className="text-gray-600">{career.description}</p>
+                    <p className="text-[var(--text-secondary)]">{career.description}</p>
                     {user?.role === 'profesor' && (
                       <div className="mt-2">
-                        <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                          📚 {getMyCoursesInCareer(career)} de tus cursos en esta carrera
+                        <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-[var(--success-bg)] text-[var(--success)] border border-[var(--warm-border)]">
+                          {getMyCoursesInCareer(career)} de tus cursos en esta carrera
                         </span>
                       </div>
                     )}
                   </div>
                   <div className="flex flex-col items-end gap-2">
-                    <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800">
+                    <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-[var(--cream)] border border-[var(--warm-border)] text-[var(--text-primary)]">
                       {career.total_months} meses
                     </span>
                     {career.status === 'active' && (
-                      <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                      <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-[var(--success-bg)] text-[var(--success)] border border-[var(--warm-border)]">
                         Activa
                       </span>
                     )}
                     {career.status === 'draft' && (
-                      <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                      <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-[var(--warning-bg)] text-[var(--warning)] border border-[var(--warm-border)]">
                         Borrador
                       </span>
                     )}
@@ -167,7 +167,7 @@ export default function CareersPage() {
 
                 {career.curriculum && career.curriculum.length > 0 && (
                   <div className="mt-6">
-                    <h4 className="text-sm font-semibold text-gray-700 mb-3">
+                    <h4 className="text-sm font-semibold text-[var(--text-primary)] mb-3">
                       Plan de Estudios ({career.curriculum.length} cursos)
                     </h4>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
@@ -178,31 +178,31 @@ export default function CareersPage() {
                           return (
                             <div
                               key={item.course.id}
-                              className={`rounded-lg p-3 text-sm ${
-                                isMyCourse 
-                                  ? 'bg-green-50 border border-green-200' 
-                                  : 'bg-gray-50'
+                              className={`rounded-lg p-3 text-sm border ${
+                                isMyCourse
+                                  ? 'bg-[var(--success-bg)] border-[var(--success)]'
+                                  : 'bg-[var(--cream)] border-[var(--warm-border)]'
                               }`}
                             >
                               <div className="flex items-start justify-between">
                                 <div className="flex-1">
-                                  <span className="font-medium text-gray-500">
+                                  <span className="font-medium text-[var(--text-muted)]">
                                     Mes {item.order_index}:
                                   </span>{' '}
                                   <Link
                                     href={`/courses/${item.course.id}`}
-                                    className="text-blue-600 hover:text-blue-700 font-medium"
+                                    className="text-[var(--accent)] hover:text-[var(--accent)]/80 font-medium"
                                   >
                                     {item.course.title}
                                   </Link>
                                   {item.course.professor && (
-                                    <p className="text-xs text-gray-500 mt-1">
+                                    <p className="text-xs text-[var(--text-muted)] mt-1">
                                       Prof: {item.course.professor.full_name}
                                     </p>
                                   )}
                                 </div>
                                 {isMyCourse && (
-                                  <span className="ml-2 text-xs text-green-600 font-semibold">
+                                  <span className="ml-2 text-xs text-[var(--success)] font-semibold">
                                     ✓ Tu curso
                                   </span>
                                 )}
@@ -214,10 +214,10 @@ export default function CareersPage() {
                   </div>
                 )}
 
-                <div className="mt-6 pt-6 border-t">
+                <div className="mt-6 pt-6 border-t border-[var(--warm-border)]">
                   <Link
                     href={`/careers/${career.id}`}
-                    className="inline-flex items-center text-blue-600 hover:text-blue-700 font-semibold"
+                    className="inline-flex items-center text-[var(--accent)] hover:text-[var(--accent)]/80 font-semibold"
                   >
                     Ver detalles completos →
                   </Link>

@@ -51,8 +51,8 @@ export default function CertificatesPage() {
 
   if (loading || !isAuthenticated) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      <div className="min-h-screen flex items-center justify-center bg-[var(--cream)]">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[var(--text-primary)]"></div>
       </div>
     );
   }
@@ -61,23 +61,23 @@ export default function CertificatesPage() {
     <Layout>
       <div className="px-4 sm:px-0">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">Mis Certificados</h1>
-          <p className="mt-2 text-gray-600">
+          <h1 className="text-3xl font-bold text-[var(--text-primary)] font-serif">Mis Certificados</h1>
+          <p className="mt-2 text-[var(--text-secondary)]">
             Gestiona y verifica tus certificados obtenidos
           </p>
         </div>
 
         {loadingCertificates ? (
           <div className="text-center py-12">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-            <p className="mt-4 text-gray-600">Cargando certificados...</p>
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[var(--text-primary)] mx-auto"></div>
+            <p className="mt-4 text-[var(--text-secondary)]">Cargando certificados...</p>
           </div>
         ) : certificates.length === 0 ? (
-          <div className="bg-white rounded-lg shadow p-8 text-center">
-            <p className="text-gray-600 mb-4">No has obtenido certificados aún.</p>
+          <div className="bg-[var(--cream-light)] rounded-lg border border-[var(--warm-border)] p-8 text-center">
+            <p className="text-[var(--text-secondary)] mb-4">No has obtenido certificados aún.</p>
             <button
               onClick={() => router.push('/courses')}
-              className="bg-blue-600 text-white px-6 py-2 rounded-lg font-semibold hover:bg-blue-700 transition-colors"
+              className="bg-[var(--btn-primary)] text-white px-6 py-2 rounded-lg font-semibold hover:opacity-90 transition-opacity"
             >
               Explorar Cursos
             </button>
@@ -87,40 +87,38 @@ export default function CertificatesPage() {
             {certificates.map((certificate) => (
               <div
                 key={certificate.id}
-                className="bg-white rounded-lg shadow hover:shadow-lg transition-shadow p-6 border-2 border-gray-200"
+                className="bg-[var(--cream-light)] rounded-lg border-2 border-[var(--warm-border)] hover:border-[var(--accent)] transition-all p-6"
               >
                 <div className="flex items-start justify-between mb-4">
                   <div>
                     {certificate.is_national_title ? (
-                      <div className="flex items-center mb-2">
-                        <span className="text-2xl mr-2">🏆</span>
-                        <h3 className="text-xl font-bold text-gray-900">
+                      <div className="mb-2">
+                        <h3 className="text-xl font-bold text-[var(--text-primary)] font-serif">
                           Título Nacional
                         </h3>
                       </div>
                     ) : (
-                      <div className="flex items-center mb-2">
-                        <span className="text-2xl mr-2">📜</span>
-                        <h3 className="text-xl font-semibold text-gray-900">
+                      <div className="mb-2">
+                        <h3 className="text-xl font-semibold text-[var(--text-primary)] font-serif">
                           Certificado de Curso
                         </h3>
                       </div>
                     )}
                     {certificate.career && (
-                      <p className="text-lg text-gray-700 font-medium">
+                      <p className="text-lg text-[var(--text-primary)] font-medium">
                         {certificate.career.name}
                       </p>
                     )}
                     {certificate.course && (
-                      <p className="text-gray-600">{certificate.course.title}</p>
+                      <p className="text-[var(--text-secondary)]">{certificate.course.title}</p>
                     )}
                   </div>
                 </div>
 
-                <div className="space-y-3 pt-4 border-t">
+                <div className="space-y-3 pt-4 border-t border-[var(--warm-border)]">
                   <div className="text-sm">
-                    <span className="text-gray-500">Emitido:</span>{' '}
-                    <span className="font-medium text-gray-900">
+                    <span className="text-[var(--text-muted)]">Emitido:</span>{' '}
+                    <span className="font-medium text-[var(--text-primary)]">
                       {new Date(certificate.issue_date).toLocaleDateString('es-PE', {
                         year: 'numeric',
                         month: 'long',
@@ -130,8 +128,8 @@ export default function CertificatesPage() {
                   </div>
 
                   <div className="text-sm">
-                    <span className="text-gray-500">Hash de Verificación:</span>
-                    <div className="mt-1 font-mono text-xs bg-gray-50 p-2 rounded break-all">
+                    <span className="text-[var(--text-muted)]">Hash de Verificación:</span>
+                    <div className="mt-1 font-mono text-xs bg-[var(--cream)] p-2 rounded break-all border border-[var(--warm-border)]">
                       {certificate.hash_digital_signature}
                     </div>
                   </div>
@@ -140,9 +138,9 @@ export default function CertificatesPage() {
                     href={getVerificationUrl(certificate.hash_digital_signature)}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-block mt-4 text-blue-600 hover:text-blue-700 text-sm font-medium"
+                    className="inline-block mt-4 text-[var(--accent)] hover:text-[var(--accent)]/80 text-sm font-medium"
                   >
-                    🔗 Verificar Certificado
+                    Verificar Certificado
                   </a>
                 </div>
               </div>
