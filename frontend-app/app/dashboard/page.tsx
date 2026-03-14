@@ -32,6 +32,7 @@ export default function DashboardPage() {
   const [certificates, setCertificates] = useState<any[]>([]);
   const [submissions, setSubmissions] = useState<any[]>([]);
   const [courseProgress, setCourseProgress] = useState<Record<number, any>>({});
+  const [myNotes, setMyNotes] = useState<Array<{ lessonId: number; lessonTitle: string; courseId: number; courseTitle: string; notes: string; date?: string }>>([]);
   const [loadingData, setLoadingData] = useState(true);
 
   useEffect(() => {
@@ -70,15 +71,33 @@ export default function DashboardPage() {
 
       // Load progress for each enrolled course
       const progressMap: Record<number, any> = {};
+      const notesArr: Array<{ lessonId: number; lessonTitle: string; courseId: number; courseTitle: string; notes: string }> = [];
       await Promise.all(
         access.map(async (a: CourseAccess) => {
           try {
             const prog = await api.getCourseProgress(a.course.id);
-            if (prog.data) progressMap[a.course.id] = prog.data;
+            if (prog.data) {
+              progressMap[a.course.id] = prog.data;
+              // Extract notes from lessons with progress
+              if (prog.data.lessons) {
+                for (const lesson of prog.data.lessons) {
+                  if (lesson.progress?.notes) {
+                    notesArr.push({
+                      lessonId: lesson.id,
+                      lessonTitle: lesson.title,
+                      courseId: a.course.id,
+                      courseTitle: a.course.title,
+                      notes: lesson.progress.notes,
+                    });
+                  }
+                }
+              }
+            }
           } catch (e) { /* ignore */ }
         })
       );
       setCourseProgress(progressMap);
+      setMyNotes(notesArr);
     } catch (error) {
       console.error('Error loading data:', error);
     } finally {
@@ -280,6 +299,50 @@ export default function DashboardPage() {
                   Ver carreras
                 </Link>
               </div>
+            </div>
+          </div>
+        )}
+
+        {/* Floating Notes / Apuntes - hack4u style */}
+        {myNotes.length > 0 && (
+          <div>
+            <div className="flex items-center justify-between mb-5">
+              <h2 className="text-xl" style={{ fontFamily: "'Source Serif 4', Georgia, serif", fontWeight: 600 }}>
+                Mis apuntes
+              </h2>
+              <span className="text-sm" style={{ color: 'var(--text-muted)' }}>
+                {myNotes.length} nota{myNotes.length !== 1 ? 's' : ''}
+              </span>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {myNotes.slice(0, 6).map((note, idx) => (
+                <Link
+                  key={`${note.lessonId}-${idx}`}
+                  href={`/courses/${note.courseId}/lessons/${note.lessonId}`}
+                  className="rounded-xl p-5 transition-all group"
+                  style={{
+                    background: '#1a1a1a',
+                    border: '1px solid rgba(255,255,255,0.08)',
+                    boxShadow: 'var(--shadow-card)',
+                  }}
+                >
+                  <span
+                    className="inline-block px-2 py-0.5 rounded text-xs font-medium mb-3"
+                    style={{ background: 'rgba(201,169,110,0.15)', color: '#c9a96e' }}
+                  >
+                    {note.courseTitle}
+                  </span>
+                  <h4 className="text-sm font-semibold mb-2" style={{ color: '#ffffff' }}>
+                    {note.lessonTitle}
+                  </h4>
+                  <p className="text-xs mb-4 line-clamp-3" style={{ color: 'rgba(255,255,255,0.5)', lineHeight: 1.6 }}>
+                    {note.notes}
+                  </p>
+                  <span className="text-xs font-medium" style={{ color: '#c9a96e' }}>
+                    → Ir a clase
+                  </span>
+                </Link>
+              ))}
             </div>
           </div>
         )}

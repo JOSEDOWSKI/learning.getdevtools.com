@@ -4,7 +4,6 @@ import { useEffect, useState, useRef } from 'react';
 import { useAuth } from '@/lib/auth';
 import { useRouter, useParams } from 'next/navigation';
 import { api } from '@/lib/api';
-import Layout from '@/components/Layout';
 
 interface LessonProgress {
   is_completed: boolean;
@@ -27,14 +26,17 @@ interface Lesson {
 }
 
 export default function LessonViewPage() {
-  const { isAuthenticated, loading, user } = useAuth();
+  const { isAuthenticated, loading } = useAuth();
   const router = useRouter();
   const params = useParams();
   const courseId = params.id ? parseInt(params.id as string, 10) : null;
   const lessonId = params.lessonId ? parseInt(params.lessonId as string, 10) : null;
   const videoRef = useRef<HTMLVideoElement>(null);
-  
+
   const [lesson, setLesson] = useState<Lesson | null>(null);
+  const [allLessons, setAllLessons] = useState<any[]>([]);
+  const [courseProgress, setCourseProgress] = useState<any>(null);
+  const [course, setCourse] = useState<any>(null);
   const [loadingLesson, setLoadingLesson] = useState(true);
   const [notes, setNotes] = useState('');
   const [savingNotes, setSavingNotes] = useState(false);
@@ -48,21 +50,26 @@ export default function LessonViewPage() {
   const [volume, setVolume] = useState(1);
   const [isMuted, setIsMuted] = useState(false);
   const [playbackRate, setPlaybackRate] = useState(1);
+  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [activeTab, setActiveTab] = useState<'contenido' | 'notas'>('contenido');
 
   useEffect(() => {
-    if (!loading && !isAuthenticated) {
-      router.push('/login');
-      return;
-    }
+    if (!loading && !isAuthenticated) { router.push('/login'); return; }
   }, [isAuthenticated, loading, router]);
 
   useEffect(() => {
     if (isAuthenticated && lessonId && !isNaN(lessonId) && lessonId > 0) {
       loadLesson();
-    } else if (lessonId === null || isNaN(lessonId) || lessonId <= 0) {
+    } else if (lessonId === null || isNaN(lessonId as number) || (lessonId as number) <= 0) {
       router.push(`/courses/${courseId}`);
     }
   }, [isAuthenticated, lessonId, courseId, router]);
+
+  useEffect(() => {
+    if (isAuthenticated && courseId) {
+      loadCourseSidebar();
+    }
+  }, [isAuthenticated, courseId]);
 
   useEffect(() => {
     if (lesson) {
@@ -74,91 +81,78 @@ export default function LessonViewPage() {
 
   async function loadLesson() {
     if (!lessonId || isNaN(lessonId) || lessonId <= 0) return;
-
     try {
       setLoadingLesson(true);
       const response = await api.getLesson(lessonId);
-      if (response.data) {
-        setLesson(response.data);
-      } else {
-        alert(response.error || 'Error al cargar la lección');
-        router.push(`/courses/${courseId}`);
-      }
-    } catch (error) {
-      console.error('Error loading lesson:', error);
-      router.push(`/courses/${courseId}`);
-    } finally {
-      setLoadingLesson(false);
-    }
+      if (response.data) setLesson(response.data);
+      else router.push(`/courses/${courseId}`);
+    } catch { router.push(`/courses/${courseId}`); }
+    finally { setLoadingLesson(false); }
+  }
+
+  async function loadCourseSidebar() {
+    if (!courseId) return;
+    try {
+      const [lessonsRes, progressRes, courseRes] = await Promise.all([
+        api.getLessons(courseId),
+        api.getCourseProgress(courseId),
+        api.getCourse(courseId),
+      ]);
+      if (lessonsRes.data) setAllLessons(lessonsRes.data.sort((a: any, b: any) => a.order_index - b.order_index));
+      if (progressRes.data) setCourseProgress(progressRes.data);
+      if (courseRes.data) setCourse(courseRes.data);
+    } catch { /* ignore */ }
   }
 
   async function handleVideoTimeUpdate() {
     if (!videoRef.current || !lesson) return;
-
     const video = videoRef.current;
-    const currentTime = video.currentTime;
-    const duration = video.duration;
-    
-    setCurrentTime(currentTime);
-    if (duration > 0 && !isNaN(duration)) {
-      setDuration(duration);
-      const progress = (currentTime / duration) * 100;
+    const ct = video.currentTime;
+    const dur = video.duration;
+    setCurrentTime(ct);
+    if (dur > 0 && !isNaN(dur)) {
+      setDuration(dur);
+      const progress = (ct / dur) * 100;
       setVideoProgress(progress);
-
-      // Actualizar progreso cada 10 segundos
-      if (Math.floor(currentTime) % 10 === 0) {
+      if (Math.floor(ct) % 10 === 0) {
         await api.updateLessonProgress(lesson.id, {
           progress_percentage: progress,
-          video_time_watched: Math.floor(currentTime),
-          is_completed: progress >= 90, // Marcar como completado si vio el 90%
+          video_time_watched: Math.floor(ct),
+          is_completed: progress >= 90,
         });
       }
-
-      // Marcar como completado si llegó al final
       if (progress >= 90 && !isVideoCompleted) {
         setIsVideoCompleted(true);
-        await api.updateLessonProgress(lesson.id, {
-          is_completed: true,
-          progress_percentage: 100,
-        });
+        await api.updateLessonProgress(lesson.id, { is_completed: true, progress_percentage: 100 });
       }
     }
   }
 
   function handlePlayPause() {
     if (!videoRef.current) return;
-    if (isPlaying) {
-      videoRef.current.pause();
-    } else {
-      videoRef.current.play();
-    }
+    if (isPlaying) videoRef.current.pause(); else videoRef.current.play();
     setIsPlaying(!isPlaying);
   }
 
   function handleSeek(e: React.ChangeEvent<HTMLInputElement>) {
     if (!videoRef.current) return;
-    const newTime = parseFloat(e.target.value);
-    videoRef.current.currentTime = newTime;
-    setCurrentTime(newTime);
+    const t = parseFloat(e.target.value);
+    videoRef.current.currentTime = t;
+    setCurrentTime(t);
   }
 
   function handleVolumeChange(e: React.ChangeEvent<HTMLInputElement>) {
     if (!videoRef.current) return;
-    const newVolume = parseFloat(e.target.value);
-    videoRef.current.volume = newVolume;
-    setVolume(newVolume);
-    setIsMuted(newVolume === 0);
+    const v = parseFloat(e.target.value);
+    videoRef.current.volume = v;
+    setVolume(v);
+    setIsMuted(v === 0);
   }
 
   function handleMuteToggle() {
     if (!videoRef.current) return;
-    if (isMuted) {
-      videoRef.current.volume = volume || 0.5;
-      setIsMuted(false);
-    } else {
-      videoRef.current.volume = 0;
-      setIsMuted(true);
-    }
+    if (isMuted) { videoRef.current.volume = volume || 0.5; setIsMuted(false); }
+    else { videoRef.current.volume = 0; setIsMuted(true); }
   }
 
   function handlePlaybackRateChange(rate: number) {
@@ -169,392 +163,374 @@ export default function LessonViewPage() {
 
   function formatTime(seconds: number): string {
     if (isNaN(seconds)) return '0:00';
-    const mins = Math.floor(seconds / 60);
-    const secs = Math.floor(seconds % 60);
-    return `${mins}:${secs.toString().padStart(2, '0')}`;
-  }
-
-  function handleVideoLoadStart() {
-    setIsVideoLoading(true);
-    setVideoError(null);
-  }
-
-  function handleVideoCanPlay() {
-    setIsVideoLoading(false);
-    if (videoRef.current) {
-      setDuration(videoRef.current.duration);
-    }
-  }
-
-  function handleVideoError() {
-    setIsVideoLoading(false);
-    setVideoError('Error al cargar el video. Por favor, intenta recargar la página.');
-  }
-
-  function handleVideoLoadedMetadata() {
-    if (videoRef.current && lesson?.progress?.video_time_watched) {
-      // Restaurar posición anterior si existe
-      videoRef.current.currentTime = lesson.progress.video_time_watched;
-    }
+    const m = Math.floor(seconds / 60);
+    const s = Math.floor(seconds % 60);
+    return `${m}:${s.toString().padStart(2, '0')}`;
   }
 
   async function handleSaveNotes() {
     if (!lesson) return;
-
     setSavingNotes(true);
     try {
-      const response = await api.updateLessonNotes(lesson.id, notes);
-      if (response.data || !response.error) {
-        alert('Notas guardadas exitosamente');
-      } else {
-        alert('Error al guardar notas');
-      }
-    } catch (error) {
-      console.error('Error saving notes:', error);
-      alert('Error al guardar notas');
-    } finally {
-      setSavingNotes(false);
-    }
+      await api.updateLessonNotes(lesson.id, notes);
+    } catch { /* ignore */ }
+    finally { setSavingNotes(false); }
   }
 
-  function getVideoUrl() {
-    if (!lesson?.video_filename) return null;
-    return api.getFileUrl(lesson.video_filename, 'video');
+  function getVideoUrl() { return lesson?.video_filename ? api.getFileUrl(lesson.video_filename, 'video') : null; }
+  function getPdfUrl() { return lesson?.pdf_filename ? api.getFileUrl(lesson.pdf_filename, 'pdf') : null; }
+
+  function getLessonProgress(lId: number) {
+    return courseProgress?.lessons?.find((l: any) => l.id === lId)?.progress;
   }
 
-  function getPdfUrl() {
-    if (!lesson?.pdf_filename) return null;
-    return api.getFileUrl(lesson.pdf_filename, 'pdf');
-  }
+  // Navigate to next/prev lesson
+  const currentIdx = allLessons.findIndex(l => l.id === lessonId);
+  const prevLesson = currentIdx > 0 ? allLessons[currentIdx - 1] : null;
+  const nextLesson = currentIdx < allLessons.length - 1 ? allLessons[currentIdx + 1] : null;
 
   if (loading || loadingLesson || !isAuthenticated) {
     return (
-      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: 'var(--cream)' }}>
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 mx-auto" style={{ borderColor: 'var(--text-primary)', borderTopColor: 'transparent', borderWidth: '3px' }}></div>
-          <p className="mt-4" style={{ color: 'var(--text-secondary)' }}>Cargando lección...</p>
-        </div>
+      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#1a1a1a' }}>
+        <div className="animate-spin rounded-full h-12 w-12" style={{ borderColor: '#c9a96e', borderTopColor: 'transparent', borderWidth: '3px' }}></div>
       </div>
     );
   }
 
   if (!lesson) {
     return (
-      <Layout>
-        <div className="rounded-lg p-8 text-center" style={{ backgroundColor: 'var(--cream-light)', border: '1px solid var(--warm-border)' }}>
-          <p style={{ color: 'var(--text-secondary)' }}>Lección no encontrada.</p>
-        </div>
-      </Layout>
+      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#1a1a1a' }}>
+        <p style={{ color: 'rgba(255,255,255,0.5)' }}>Leccion no encontrada.</p>
+      </div>
     );
   }
 
   const videoUrl = getVideoUrl();
   const pdfUrl = getPdfUrl();
+  const completedCount = courseProgress?.completedLessons || 0;
+  const totalCount = courseProgress?.totalLessons || allLessons.length;
+  const overallProg = courseProgress?.overallProgress || 0;
 
   return (
-    <Layout>
-      <div className="px-4 sm:px-0" style={{ backgroundColor: 'var(--cream)' }}>
-        <div className="mb-6">
-          <button
-            onClick={() => router.push(`/courses/${courseId}`)}
-            className="mb-4 transition-colors"
-            style={{ color: 'var(--accent)' }}
-          >
-            ← Volver al Curso
-          </button>
-          <h1 className="text-3xl font-bold" style={{ color: 'var(--text-primary)', fontFamily: "'Source Serif 4', Georgia, serif" }}>{lesson.title}</h1>
-          <div className="mt-2 flex items-center gap-4">
-            <span className="text-sm" style={{ color: 'var(--text-muted)' }}>
-              Progreso: {Math.round(videoProgress)}%
-            </span>
+    <div className="min-h-screen flex" style={{ backgroundColor: '#111111' }}>
+      {/* Sidebar - hack4u style */}
+      <div
+        className="shrink-0 flex flex-col h-screen sticky top-0 overflow-hidden transition-all"
+        style={{
+          width: sidebarOpen ? 340 : 0,
+          background: '#1a1a1a',
+          borderRight: sidebarOpen ? '1px solid rgba(255,255,255,0.08)' : 'none',
+        }}
+      >
+        {sidebarOpen && (
+          <div className="flex flex-col h-full overflow-hidden" style={{ width: 340 }}>
+            {/* Course header */}
+            <div className="p-4 shrink-0" style={{ borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
+              <button
+                onClick={() => router.push(`/courses/${courseId}`)}
+                className="text-xs mb-3 flex items-center gap-1"
+                style={{ color: 'rgba(255,255,255,0.4)' }}
+              >
+                ← Volver
+              </button>
+              <h2 className="text-sm font-semibold mb-2" style={{ color: '#ffffff', fontFamily: "'Source Serif 4', Georgia, serif" }}>
+                {course?.title || 'Curso'}
+              </h2>
+              <p className="text-xs mb-3" style={{ color: 'rgba(255,255,255,0.4)' }}>
+                {Math.round(overallProg)}% completado ({completedCount}/{totalCount})
+              </p>
+              <div className="w-full rounded-full h-1.5" style={{ background: 'rgba(255,255,255,0.1)' }}>
+                <div className="h-1.5 rounded-full no-transition" style={{ background: '#c9a96e', width: `${overallProg}%` }} />
+              </div>
+            </div>
+
+            {/* Lesson list */}
+            <div className="flex-1 overflow-y-auto" style={{ scrollbarWidth: 'thin', scrollbarColor: 'rgba(255,255,255,0.1) transparent' }}>
+              {allLessons.map((l, idx) => {
+                const prog = getLessonProgress(l.id);
+                const isActive = l.id === lessonId;
+                const isCompleted = prog?.is_completed;
+                const hasProgress = (prog?.progress_percentage || 0) > 0;
+
+                return (
+                  <button
+                    key={l.id}
+                    onClick={() => router.push(`/courses/${courseId}/lessons/${l.id}`)}
+                    className="w-full text-left flex items-center gap-3 px-4 py-3 transition-all"
+                    style={{
+                      background: isActive ? 'rgba(201,169,110,0.12)' : 'transparent',
+                      borderLeft: isActive ? '3px solid #c9a96e' : '3px solid transparent',
+                    }}
+                  >
+                    {/* Status icon */}
+                    <div
+                      className="w-7 h-7 rounded-full flex items-center justify-center shrink-0 text-xs font-bold"
+                      style={
+                        isCompleted
+                          ? { background: 'var(--success)', color: '#fff' }
+                          : isActive
+                            ? { background: '#c9a96e', color: '#1a1a1a' }
+                            : hasProgress
+                              ? { background: 'rgba(14,165,233,0.2)', color: 'var(--accent)' }
+                              : { background: 'rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.3)' }
+                      }
+                    >
+                      {isCompleted ? (
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round"><path d="M20 6L9 17l-5-5"/></svg>
+                      ) : (
+                        idx + 1
+                      )}
+                    </div>
+
+                    <div className="flex-1 min-w-0">
+                      <p
+                        className="text-sm truncate"
+                        style={{ color: isActive ? '#ffffff' : isCompleted ? 'rgba(255,255,255,0.5)' : 'rgba(255,255,255,0.7)' }}
+                      >
+                        {l.title}
+                      </p>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Main content */}
+      <div className="flex-1 flex flex-col min-h-screen">
+        {/* Top bar */}
+        <div className="shrink-0 flex items-center justify-between px-4 h-12" style={{ background: '#1a1a1a', borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => setSidebarOpen(!sidebarOpen)}
+              className="p-1.5 rounded"
+              style={{ color: 'rgba(255,255,255,0.5)' }}
+            >
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                <line x1="3" y1="6" x2="21" y2="6"></line>
+                <line x1="3" y1="12" x2="21" y2="12"></line>
+                <line x1="3" y1="18" x2="21" y2="18"></line>
+              </svg>
+            </button>
+            <h1 className="text-sm font-medium truncate" style={{ color: '#ffffff' }}>
+              {lesson.title}
+            </h1>
+          </div>
+          <div className="flex items-center gap-2">
             {isVideoCompleted && (
-              <span className="text-sm font-medium" style={{ color: 'var(--success)' }}>
-                Completada
-              </span>
+              <span className="tag tag-success text-xs">Completada</span>
             )}
+            {/* Nav arrows */}
+            <button
+              onClick={() => prevLesson && router.push(`/courses/${courseId}/lessons/${prevLesson.id}`)}
+              disabled={!prevLesson}
+              className="p-1.5 rounded disabled:opacity-20"
+              style={{ color: 'rgba(255,255,255,0.5)' }}
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="15 18 9 12 15 6"></polyline></svg>
+            </button>
+            <button
+              onClick={() => nextLesson && router.push(`/courses/${courseId}/lessons/${nextLesson.id}`)}
+              disabled={!nextLesson}
+              className="p-1.5 rounded disabled:opacity-20"
+              style={{ color: 'rgba(255,255,255,0.5)' }}
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
+            </button>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Contenido Principal */}
-          <div className="lg:col-span-2 space-y-6">
-            {/* Video Mejorado */}
-            {videoUrl && (
-              <div className="rounded-lg overflow-hidden" style={{ backgroundColor: 'var(--cream-light)', border: '2px solid var(--warm-border)' }}>
-                <h2 className="text-xl font-semibold mb-4 p-4 pb-0" style={{ color: 'var(--text-primary)', fontFamily: "'Source Serif 4', Georgia, serif" }}>
-                  Video de la Lección
-                </h2>
-                <div className="relative w-full bg-black" style={{ paddingBottom: '56.25%' }}>
-                  {/* Video Element */}
-                  <video
-                    ref={videoRef}
-                    className="absolute top-0 left-0 w-full h-full"
-                    onTimeUpdate={handleVideoTimeUpdate}
-                    onPlay={() => setIsPlaying(true)}
-                    onPause={() => setIsPlaying(false)}
-                    onLoadStart={handleVideoLoadStart}
-                    onCanPlay={handleVideoCanPlay}
-                    onError={handleVideoError}
-                    onLoadedMetadata={handleVideoLoadedMetadata}
-                    preload="metadata"
-                    playsInline
-                    src={videoUrl}
-                  >
-                    Tu navegador no soporta la reproducción de video.
-                  </video>
+        {/* Video area */}
+        <div className="shrink-0">
+          {videoUrl ? (
+            <div className="relative w-full bg-black" style={{ paddingBottom: '50%', maxHeight: '70vh' }}>
+              <video
+                ref={videoRef}
+                className="absolute top-0 left-0 w-full h-full"
+                style={{ objectFit: 'contain' }}
+                onTimeUpdate={handleVideoTimeUpdate}
+                onPlay={() => setIsPlaying(true)}
+                onPause={() => setIsPlaying(false)}
+                onLoadStart={() => { setIsVideoLoading(true); setVideoError(null); }}
+                onCanPlay={() => { setIsVideoLoading(false); if (videoRef.current) setDuration(videoRef.current.duration); }}
+                onError={() => { setIsVideoLoading(false); setVideoError('Error al cargar el video.'); }}
+                onLoadedMetadata={() => { if (videoRef.current && lesson?.progress?.video_time_watched) videoRef.current.currentTime = lesson.progress.video_time_watched; }}
+                preload="metadata"
+                playsInline
+                src={videoUrl}
+              />
 
-                  {/* Loading Indicator */}
-                  {isVideoLoading && (
-                    <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50">
-                      <div className="text-center">
-                        <div className="animate-spin rounded-full h-12 w-12 mx-auto" style={{ borderColor: 'white', borderTopColor: 'transparent', borderWidth: '3px' }}></div>
-                        <p className="mt-4 text-white text-sm">Cargando video...</p>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Error Message */}
-                  {videoError && (
-                    <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-75">
-                      <div className="text-center p-4">
-                        <p className="text-red-400 mb-4">{videoError}</p>
-                        <button
-                          onClick={() => {
-                            setVideoError(null);
-                            setIsVideoLoading(true);
-                            if (videoRef.current) {
-                              videoRef.current.load();
-                            }
-                          }}
-                          className="px-4 py-2 text-white rounded transition-colors hover:opacity-90"
-                          style={{ backgroundColor: 'var(--btn-primary)' }}
-                        >
-                          Reintentar
-                        </button>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Custom Controls Overlay */}
-                  {!isVideoLoading && !videoError && (
-                    <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-4">
-                      {/* Progress Bar */}
-                      <div className="mb-3">
-                        <input
-                          type="range"
-                          min="0"
-                          max={duration || 0}
-                          value={currentTime}
-                          onChange={handleSeek}
-                          className="w-full h-1 rounded-lg appearance-none cursor-pointer slider"
-                          style={{
-                            background: `linear-gradient(to right, var(--accent) 0%, var(--accent) ${(currentTime / (duration || 1)) * 100}%, #4b5563 ${(currentTime / (duration || 1)) * 100}%, #4b5563 100%)`
-                          }}
-                        />
-                      </div>
-
-                      {/* Controls */}
-                      <div className="flex items-center justify-between text-white">
-                        <div className="flex items-center gap-3">
-                          {/* Play/Pause */}
-                          <button
-                            onClick={handlePlayPause}
-                            className="p-2 rounded transition-colors"
-                            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.2)'}
-                            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
-                            aria-label={isPlaying ? 'Pausar' : 'Reproducir'}
-                          >
-                            {isPlaying ? (
-                              <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
-                                <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zM7 8a1 1 0 012 0v4a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v4a1 1 0 102 0V8a1 1 0 00-1-1z" clipRule="evenodd" />
-                              </svg>
-                            ) : (
-                              <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
-                                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clipRule="evenodd" />
-                              </svg>
-                            )}
-                          </button>
-
-                          {/* Volume */}
-                          <div className="flex items-center gap-2">
-                            <button
-                              onClick={handleMuteToggle}
-                              className="p-2 rounded transition-colors"
-                              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.2)'}
-                              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
-                              aria-label={isMuted ? 'Activar sonido' : 'Silenciar'}
-                            >
-                              {isMuted || volume === 0 ? (
-                                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                                  <path fillRule="evenodd" d="M9.383 3.076A1 1 0 0110 4v12a1 1 0 01-1.617.793L4.383 13H2a1 1 0 01-1-1V8a1 1 0 011-1h2.383l4.617-3.793a1 1 0 011.383-.131zM14.657 2.929a1 1 0 011.414 0A9.972 9.972 0 0119 10a9.972 9.972 0 01-2.929 7.071 1 1 0 01-1.414-1.414A7.971 7.971 0 0017 10c0-2.21-.894-4.208-2.343-5.657a1 1 0 010-1.414zm-2.829 2.828a1 1 0 011.415 0A5.983 5.983 0 0115 10a5.984 5.984 0 01-1.757 4.243 1 1 0 01-1.415-1.415A3.984 3.984 0 0013 10a3.983 3.983 0 00-1.172-2.828 1 1 0 010-1.415z" clipRule="evenodd" />
-                                </svg>
-                              ) : (
-                                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                                  <path fillRule="evenodd" d="M9.383 3.076A1 1 0 0110 4v12a1 1 0 01-1.617.793L4.383 13H2a1 1 0 01-1-1V8a1 1 0 011-1h2.383l4.617-3.793a1 1 0 011.383-.131zM14.657 2.929a1 1 0 011.414 0A9.972 9.972 0 0119 10a9.972 9.972 0 01-2.929 7.071 1 1 0 01-1.414-1.414A7.971 7.971 0 0017 10c0-2.21-.894-4.208-2.343-5.657a1 1 0 010-1.414zm-2.829 2.828a1 1 0 011.415 0A5.983 5.983 0 0115 10a5.984 5.984 0 01-1.757 4.243 1 1 0 01-1.415-1.415A3.984 3.984 0 0013 10a3.983 3.983 0 00-1.172-2.828 1 1 0 010-1.415z" clipRule="evenodd" />
-                                </svg>
-                              )}
-                            </button>
-                            <input
-                              type="range"
-                              min="0"
-                              max="1"
-                              step="0.1"
-                              value={isMuted ? 0 : volume}
-                              onChange={handleVolumeChange}
-                              className="w-20 h-1 rounded-lg appearance-none cursor-pointer"
-                              style={{ backgroundColor: '#4b5563' }}
-                            />
-                          </div>
-
-                          {/* Time Display */}
-                          <span className="text-sm font-mono">
-                            {formatTime(currentTime)} / {formatTime(duration)}
-                          </span>
-                        </div>
-
-                        <div className="flex items-center gap-2">
-                          {/* Playback Rate */}
-                          <div className="flex items-center gap-1">
-                            <button
-                              onClick={() => handlePlaybackRateChange(playbackRate === 0.75 ? 1 : playbackRate === 1 ? 1.25 : playbackRate === 1.25 ? 1.5 : playbackRate === 1.5 ? 2 : 0.75)}
-                              className="px-2 py-1 text-sm rounded transition-colors"
-                              style={{ backgroundColor: 'rgba(255, 255, 255, 0.2)' }}
-                              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.3)'}
-                              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.2)'}
-                            >
-                              {playbackRate}x
-                            </button>
-                          </div>
-
-                          {/* Fullscreen */}
-                          <button
-                            onClick={() => {
-                              if (videoRef.current) {
-                                if (videoRef.current.requestFullscreen) {
-                                  videoRef.current.requestFullscreen();
-                                }
-                              }
-                            }}
-                            className="p-2 rounded transition-colors"
-                            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.2)'}
-                            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
-                            aria-label="Pantalla completa"
-                          >
-                            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                              <path d="M3 4a1 1 0 011-1h4a1 1 0 010 2H6.414l2.293 2.293a1 1 0 01-1.414 1.414L5 6.414V8a1 1 0 01-2 0V4zm9 1a1 1 0 010-2h4a1 1 0 011 1v4a1 1 0 01-2 0V6.414l-2.293 2.293a1 1 0 11-1.414-1.414L13.586 5H12zm-9 7a1 1 0 012 0v1.586l2.293-2.293a1 1 0 111.414 1.414L6.414 15H8a1 1 0 010 2H4a1 1 0 01-1-1v-4zm13-1a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 010-2h1.586l-2.293-2.293a1 1 0 111.414-1.414L15 13.586V12a1 1 0 011-1z" />
-                            </svg>
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  )}
+              {isVideoLoading && (
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="animate-spin rounded-full h-10 w-10" style={{ borderColor: '#c9a96e', borderTopColor: 'transparent', borderWidth: '3px' }}></div>
                 </div>
+              )}
 
-                {/* Progress Summary */}
-                <div className="p-4 pt-2">
-                  <div className="flex items-center justify-between text-sm mb-2" style={{ color: 'var(--text-secondary)' }}>
-                    <span>Progreso de visualización</span>
-                    <span>{Math.round(videoProgress)}%</span>
-                  </div>
-                  <div className="w-full rounded-full h-2" style={{ backgroundColor: 'var(--cream)', border: '1px solid var(--warm-border)' }}>
-                    <div
-                      className="h-2 rounded-full transition-all"
-                      style={{ backgroundColor: 'var(--text-primary)', width: `${videoProgress}%` }}
-                    ></div>
+              {videoError && (
+                <div className="absolute inset-0 flex items-center justify-center bg-black/75">
+                  <div className="text-center">
+                    <p className="text-sm mb-3" style={{ color: '#ef4444' }}>{videoError}</p>
+                    <button onClick={() => { setVideoError(null); setIsVideoLoading(true); videoRef.current?.load(); }}
+                      className="px-4 py-2 text-sm rounded-lg btn-primary">Reintentar</button>
                   </div>
                 </div>
-              </div>
-            )}
+              )}
 
-            {/* PDF */}
-            {pdfUrl && (
-              <div className="rounded-lg p-4" style={{ backgroundColor: 'var(--cream-light)', border: '2px solid var(--warm-border)' }}>
-                <h2 className="text-xl font-semibold mb-4" style={{ color: 'var(--text-primary)', fontFamily: "'Source Serif 4', Georgia, serif" }}>
-                  Material de Lectura
-                </h2>
-                <iframe
-                  src={pdfUrl}
-                  className="w-full h-96 rounded-lg"
-                  style={{ border: '1px solid var(--warm-border)' }}
-                  title="PDF Viewer"
-                ></iframe>
-                <a
-                  href={pdfUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="mt-4 inline-block transition-colors"
-                  style={{ color: 'var(--accent)' }}
-                >
-                  Abrir PDF en nueva pestaña
-                </a>
-              </div>
-            )}
-
-            {/* Contenido de Texto */}
-            {lesson.content && (
-              <div className="rounded-lg p-6" style={{ backgroundColor: 'var(--cream-light)', border: '2px solid var(--warm-border)' }}>
-                <h2 className="text-xl font-semibold mb-4" style={{ color: 'var(--text-primary)', fontFamily: "'Source Serif 4', Georgia, serif" }}>
-                  Contenido
-                </h2>
-                <div className="prose max-w-none">
-                  <pre className="whitespace-pre-wrap text-sm p-4 rounded" style={{ backgroundColor: 'var(--cream)', border: '1px solid var(--warm-border)', color: 'var(--text-secondary)' }}>
-                    {lesson.content}
-                  </pre>
+              {/* Controls */}
+              {!isVideoLoading && !videoError && (
+                <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent px-4 pb-3 pt-10">
+                  <input type="range" min="0" max={duration || 0} value={currentTime} onChange={handleSeek}
+                    className="w-full h-1 rounded-lg appearance-none cursor-pointer slider mb-2"
+                    style={{ background: `linear-gradient(to right, #c9a96e 0%, #c9a96e ${(currentTime/(duration||1))*100}%, rgba(255,255,255,0.2) ${(currentTime/(duration||1))*100}%, rgba(255,255,255,0.2) 100%)` }}
+                  />
+                  <div className="flex items-center justify-between text-white">
+                    <div className="flex items-center gap-3">
+                      <button onClick={handlePlayPause} className="p-1">
+                        {isPlaying ? (
+                          <svg width="20" height="20" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zM7 8a1 1 0 012 0v4a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v4a1 1 0 102 0V8a1 1 0 00-1-1z" clipRule="evenodd"/></svg>
+                        ) : (
+                          <svg width="20" height="20" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clipRule="evenodd"/></svg>
+                        )}
+                      </button>
+                      <button onClick={handleMuteToggle} className="p-1">
+                        <svg width="16" height="16" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M9.383 3.076A1 1 0 0110 4v12a1 1 0 01-1.617.793L4.383 13H2a1 1 0 01-1-1V8a1 1 0 011-1h2.383l4.617-3.793a1 1 0 011.383-.131z" clipRule="evenodd"/>
+                        </svg>
+                      </button>
+                      <input type="range" min="0" max="1" step="0.1" value={isMuted ? 0 : volume} onChange={handleVolumeChange}
+                        className="w-16 h-1 rounded-lg appearance-none cursor-pointer" style={{ backgroundColor: 'rgba(255,255,255,0.2)' }}/>
+                      <span className="text-xs font-mono" style={{ color: 'rgba(255,255,255,0.6)' }}>
+                        {formatTime(currentTime)} / {formatTime(duration)}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <button onClick={() => handlePlaybackRateChange(playbackRate === 0.75 ? 1 : playbackRate === 1 ? 1.25 : playbackRate === 1.25 ? 1.5 : playbackRate === 1.5 ? 2 : 0.75)}
+                        className="px-2 py-0.5 text-xs rounded" style={{ backgroundColor: 'rgba(255,255,255,0.15)' }}>
+                        {playbackRate}x
+                      </button>
+                      <button onClick={() => { if (videoRef.current?.requestFullscreen) videoRef.current.requestFullscreen(); }} className="p-1">
+                        <svg width="16" height="16" fill="currentColor" viewBox="0 0 20 20">
+                          <path d="M3 4a1 1 0 011-1h4a1 1 0 010 2H6.414l2.293 2.293a1 1 0 01-1.414 1.414L5 6.414V8a1 1 0 01-2 0V4zm9 1a1 1 0 010-2h4a1 1 0 011 1v4a1 1 0 01-2 0V6.414l-2.293 2.293a1 1 0 11-1.414-1.414L13.586 5H12zm-9 7a1 1 0 012 0v1.586l2.293-2.293a1 1 0 111.414 1.414L6.414 15H8a1 1 0 010 2H4a1 1 0 01-1-1v-4zm13-1a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 010-2h1.586l-2.293-2.293a1 1 0 111.414-1.414L15 13.586V12a1 1 0 011-1z"/>
+                        </svg>
+                      </button>
+                    </div>
+                  </div>
                 </div>
-              </div>
-            )}
+              )}
+            </div>
+          ) : (
+            <div className="p-8 text-center" style={{ background: '#111111' }}>
+              <p className="text-sm" style={{ color: 'rgba(255,255,255,0.4)' }}>Esta leccion no tiene video</p>
+            </div>
+          )}
+        </div>
+
+        {/* Below video: tabs for content & notes */}
+        <div className="flex-1 overflow-y-auto" style={{ background: '#1a1a1a' }}>
+          {/* Tab bar */}
+          <div className="flex px-6 pt-4 gap-1" style={{ borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
+            {(['contenido', 'notas'] as const).map(tab => (
+              <button
+                key={tab}
+                onClick={() => setActiveTab(tab)}
+                className="px-4 py-2.5 text-sm font-medium capitalize"
+                style={{
+                  color: activeTab === tab ? '#ffffff' : 'rgba(255,255,255,0.4)',
+                  borderBottom: activeTab === tab ? '2px solid #c9a96e' : '2px solid transparent',
+                }}
+              >
+                {tab === 'contenido' ? 'Contenido' : 'Mis Notas'}
+              </button>
+            ))}
           </div>
 
-          {/* Sidebar - Notas y Progreso */}
-          <div className="lg:col-span-1">
-            <div className="rounded-lg p-6 sticky top-6" style={{ backgroundColor: 'var(--cream-light)', border: '2px solid var(--warm-border)' }}>
-              <h3 className="text-lg font-semibold mb-4" style={{ color: 'var(--text-primary)', fontFamily: "'Source Serif 4', Georgia, serif" }}>
-                Mis Notas
-              </h3>
-              <textarea
-                value={notes}
-                onChange={(e) => setNotes(e.target.value)}
-                rows={8}
-                className="w-full px-4 py-2 rounded-lg focus:outline-none focus:ring-2 mb-4 transition-colors"
-                style={{ border: '1px solid var(--warm-border)', backgroundColor: 'var(--cream)', color: 'var(--text-primary)' }}
-                placeholder="Escribe tus notas aquí..."
-              />
-              <button
-                onClick={handleSaveNotes}
-                disabled={savingNotes}
-                className="w-full text-white py-2 rounded font-semibold transition-colors hover:opacity-90 disabled:opacity-50"
-                style={{ backgroundColor: 'var(--btn-primary)' }}
-              >
-                {savingNotes ? 'Guardando...' : 'Guardar Notas'}
-              </button>
+          <div className="p-6">
+            {activeTab === 'contenido' && (
+              <div className="space-y-6">
+                {/* Lesson text content */}
+                {lesson.content && (
+                  <div>
+                    <h3 className="text-lg mb-4" style={{ fontFamily: "'Source Serif 4', Georgia, serif", color: '#ffffff' }}>
+                      {lesson.title}
+                    </h3>
+                    <div className="prose max-w-none">
+                      <pre className="whitespace-pre-wrap text-sm p-5 rounded-xl leading-relaxed"
+                        style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', color: 'rgba(255,255,255,0.7)' }}>
+                        {lesson.content}
+                      </pre>
+                    </div>
+                  </div>
+                )}
 
-              <div className="mt-6 pt-6" style={{ borderTop: '1px solid var(--warm-border)' }}>
-                <h4 className="text-sm font-semibold mb-2" style={{ color: 'var(--text-primary)' }}>
-                  Progreso de la Lección
-                </h4>
-                <div className="space-y-2">
-                  <div className="flex justify-between text-sm">
-                    <span style={{ color: 'var(--text-secondary)' }}>Completado</span>
-                    <span className="font-medium" style={{ color: 'var(--text-primary)' }}>{Math.round(videoProgress)}%</span>
+                {/* PDF material */}
+                {pdfUrl && (
+                  <div>
+                    <h3 className="text-sm font-semibold mb-3" style={{ color: 'rgba(255,255,255,0.5)' }}>Material PDF</h3>
+                    <iframe src={pdfUrl} className="w-full h-96 rounded-xl" style={{ border: '1px solid rgba(255,255,255,0.08)' }} title="PDF"/>
+                    <a href={pdfUrl} target="_blank" rel="noopener noreferrer" className="mt-3 inline-block text-sm" style={{ color: '#c9a96e' }}>
+                      Abrir en nueva pestana →
+                    </a>
                   </div>
-                  <div className="w-full rounded-full h-2" style={{ backgroundColor: 'var(--cream)', border: '1px solid var(--warm-border)' }}>
-                    <div
-                      className="h-2 rounded-full transition-all"
-                      style={{ backgroundColor: 'var(--success)', width: `${videoProgress}%` }}
-                    ></div>
+                )}
+
+                {!lesson.content && !pdfUrl && (
+                  <p className="text-sm text-center py-8" style={{ color: 'rgba(255,255,255,0.3)' }}>
+                    Esta leccion solo tiene contenido en video.
+                  </p>
+                )}
+
+                {/* Next lesson CTA */}
+                {nextLesson && (
+                  <div className="pt-6" style={{ borderTop: '1px solid rgba(255,255,255,0.08)' }}>
+                    <button
+                      onClick={() => router.push(`/courses/${courseId}/lessons/${nextLesson.id}`)}
+                      className="w-full flex items-center justify-between p-4 rounded-xl transition-all"
+                      style={{ background: 'rgba(201,169,110,0.08)', border: '1px solid rgba(201,169,110,0.2)' }}
+                    >
+                      <div className="text-left">
+                        <p className="text-xs mb-1" style={{ color: 'rgba(255,255,255,0.4)' }}>Siguiente leccion</p>
+                        <p className="text-sm font-medium" style={{ color: '#ffffff' }}>{nextLesson.title}</p>
+                      </div>
+                      <span style={{ color: '#c9a96e' }}>→</span>
+                    </button>
                   </div>
-                  {isVideoCompleted && (
-                    <p className="text-sm font-medium mt-2" style={{ color: 'var(--success)' }}>
-                      Lección completada
-                    </p>
-                  )}
-                </div>
+                )}
               </div>
-            </div>
+            )}
+
+            {activeTab === 'notas' && (
+              <div>
+                <p className="text-xs mb-4" style={{ color: 'rgba(255,255,255,0.4)' }}>
+                  Tus notas personales para esta leccion. Se guardan automaticamente.
+                </p>
+                <textarea
+                  value={notes}
+                  onChange={(e) => setNotes(e.target.value)}
+                  rows={12}
+                  className="w-full px-4 py-3 rounded-xl text-sm"
+                  style={{
+                    background: 'rgba(255,255,255,0.04)',
+                    border: '1px solid rgba(255,255,255,0.1)',
+                    color: 'rgba(255,255,255,0.8)',
+                    resize: 'vertical',
+                  }}
+                  placeholder="Escribe tus notas aqui..."
+                />
+                <button
+                  onClick={handleSaveNotes}
+                  disabled={savingNotes}
+                  className="mt-4 px-6 py-2.5 text-sm font-medium rounded-lg disabled:opacity-50"
+                  style={{ background: '#c9a96e', color: '#1a1a1a' }}
+                >
+                  {savingNotes ? 'Guardando...' : 'Guardar notas'}
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </div>
-    </Layout>
+    </div>
   );
 }
-
